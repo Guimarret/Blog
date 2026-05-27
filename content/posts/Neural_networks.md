@@ -22,14 +22,16 @@ There's a catch to make things more flexible: each input also has a weight, whic
 Considering all this information, we can now think of some situations in which the threshold function is not that obvious and we don't know the ideal weight.
 So in this case we have to change it little by little while testing to reach the ideal input. For example, a group of inputs that should output yes or no for a complex question like the buy-more or sell-some action trade (which buy stays for true and sell for false).
 
+### Training and the learning rate
+
 It's kind of complicated to think about for the first time, but it makes sense. We don't care how the weights are set but only if the output is correct. So we have to provide a data source of example with the source of truth, like a datasheet with multiple lines, where each line will have 200 inputs and the desired result.
 Then create a function to change the weights individually based on the desired result so it becomes more propitious to get the correct answer.
 
 ![formula_error_correct](/img/neural_net/learning_rates.png)
 
-This function can look a bit odd, but it's simple. We have the new calculated value, the current weight that multiplies the input, the learning rate, the input at step time, and the expected output at the step time.
+This function can look a bit odd, but it's simple. We have the new calculated value, the current weight that multiplies the input, the learning rate, the input at step time, the expected output at the step time, and the actual output the neuron produced at that step. The correction is driven by the difference between the expected and the actual output (expected − actual), so without comparing the two, there would be nothing to correct.
 
-The most important is the learning rate, which will tell how much correction should be applied. If it's too much, it will be a problem for scenarios in which this input should have less value or the activation shouldn't happen. If it's too little, it will not activate the function, and you will run this process more times than needed.
+The most important is the learning rate, which will tell how much correction should be applied. If it's too much, it will be a problem for scenarios in which this input should have less value or the activation shouldn't happen. If it's too little, it will take too long, and you will run this process more times than needed.
 
 If we look from the high ground, it just applies a little change to the weight, which will direct the total sum closer to the desired state. (You can look at it for more time or reflect on it if needed).
 
@@ -37,7 +39,7 @@ But this fix in weight will happen for all the input weights at the same time. T
 
 So after all this mathematics and changing the weights of your perceptron, it becomes actually useful, and when you feed it new real-world data, it outputs with a good accuracy (what is good here depends on context because a probability of rain accuracy of 80% can be okay, I mean, if it misses in 20% of the cases is not the end of the world).  So now you can set up your tech house with multiple sensors and connect everything to your local PC to run and feed the Perceptron and know everything about the chances of your roommate “forgetting” to do the dishes again.
 
-## ADALINE (Backpropagation)
+## ADALINE
 >I was pondering going directly to multilayer perceptron and explaining backpropagation there. But it would be missing something, so I think ADALINE is a good context bridge. 
 This topic will be a bit math-heavy, so take your time to understand and digest the topics. I'm not going to bring anything outside basic math without a proper explanation of what it is and how it works. Some graph visualization will be necessary for simplification, so be ready.
 
@@ -45,25 +47,64 @@ ADALINE came after the perceptron and is the same except for the evolution in tr
 
 First, ADALINE changes the error calculation format, instead of the previously described one, we are going to use what is called the mean squared error. This one can change the weights of the neuron even when it's corrected. Which creates a more optimized training system.
 
+### Squared error and MSE
+
 Let's dive into how the MSE (mean squared error) formula works, starting with square errors, which is:
  $$(y_j - \hat{y}_j)^2$$ 
 
-It's simple, we just calculate the square of the expected value and the predicted value.
+It's simple, we just calculate the square of the difference between the expected and the predicted value.
 
 The mean squared error (MSE) is the "MEAN" of the square error function, so we divide the sum of all square errors summed by the number of times it was summed. Don't be scared of the formula, it's just the mathematical way of representing, and I'm going to leave it here so the nerdy ones just get what I'm talking about without reading everything:
 
-$$MSE = \frac{1}{n} \sum_{j=1}^{n} (y_j - \hat{y}_j)^2 = (y_1 - \hat{y}_1)^2 + (y_2 - \hat{y}_2)^2 + \ldots + (y_n - \hat{y}_n)^2$$
+$$MSE = \frac{1}{n} \sum_{j=1}^{n} (y_j - \hat{y}_j)^2 = \frac{1}{n}\left[(y_1 - \hat{y}_1)^2 + \ldots + (y_n - \hat{y}_n)^2\right]$$
 
 But what does this mean, like, how do we use it, and why are we talking about that?
 
-- Sorry for that but we are going to need more math context to aggregate the meaning of things.
+- Sorry for that, but we are going to need more math context to aggregate the meaning of things.
 
-Consider a perceptron with 2 inputs and consequently 2 weights. It will have this format, which is the classic linear function (it's a straight line). The angle will be defined by the weights, and if I can force a bit of your memory, the extra variable, _usually_ C, would change the starting point of the line. In our case, the C could be the BIAS, which we can think of as a way to change the threshold talked about before. (Make it easier to be reached, for example.)
+Consider a perceptron with 1 input and 2 weights (bias is a weight, but we can ignore that for now). It will have this format, which is the classic linear function (it's a straight line). The slope will be defined by the weights, and if I can force a bit of your memory, the extra variable would change the starting point of the line. In our case, the B is a phantom constant, and the weight of this constant is the BIAS. Don't give it much thought, and for now just think of it as 0 so it doesn't interfere in the graph, which we can think of as a way to change the threshold talked about before. (Make it easier to be reached, for example.)
 
 $$\hat{y} = w_1 b + w_2 x_1$$
 
-When we plot that (insert into a graph), we unlock some visual properties.
+When we plot that (insert into a graph), we unlock some visual properties:
 
 ![linear_function_for_errors](/img/neural_net/function_plot.jpg)
 [Plot source](https://com-cog-book.github.io/com-cog-book/features/adaline.html#Threshold-decision-function)
 
+
+The vertical axis represents the predicted value, and the pink dots the expected values (the real values without the weights).
+
+>This plot represents the linear regression of inputs and outputs, you also don't have to get all the nuances of what this means but it is kinda of a trend of the function indicating the relationship between inputs and outputs.
+
+This represents the line that best fits the points in the Cartesian plane. Also thinkable as trying to find a line that reduces the distance between the pink dots and the line, don't forget that the only variable we can change there is the weight. 
+
+### The error surface and minima
+
+At the end of the day, when considering multiple inputs, we are looking for the “minimum” total squared errors (which is summed across all data points). So to demonstrate a real situation with two inputs (it's not possible to visualize more dimensions, too, so we are going to show everything from now on considering only two inputs and generalize for more inputs):
+
+{{< figure src="/img/neural_net/error_surface_1.png" 
+   alt="Error surface 1" 
+   caption="Figure 3 — Error surface, side view" 
+   align="center" >}}
+
+>In optimization maths this is a [convex optimization](https://en.wikipedia.org/wiki/Convex_optimization) problem.
+
+This graph represents the influence of the weights in the inputs when compared to the sum of squared errors.
+
+As said before, we are looking for the lowest point in the vertical axis that has the lowest value for the sum of error, which means the best pair of weights for every input possible or even the optimal function. The name of this lowest point is minima. 
+
+<details>
+<summary>Curiosity: when there's more than one minima</summary>
+
+In the case of ADALINA only a unique minima is possible, but in other situations you could have multiple bases or low points. Of course only one would be the lowest, which is called the global minima but could have other local minimas like this other plot:
+
+{{< figure src="/img/neural_net/multiple_minimas.png" 
+   alt="Error surface 1" 
+   caption="Figure 3 — Error surface, side view" 
+   align="center" >}}
+
+</details>
+
+>Cool view of neural networks is that all of it is just some optimization problem in which, given some input, we want to achieve the lowest error summing rates.
+
+### Gradient Descent algorithm
