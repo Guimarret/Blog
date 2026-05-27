@@ -45,7 +45,9 @@ This topic will be a bit math-heavy, so take your time to understand and digest 
 
 ADALINE came after the perceptron and is the same except for the evolution in training. Just to recap, the error computation in the perceptron is the comparison between the expected output and the current output, which will be subtracted and multiplied by the learning rate and the input value. Also important to observe that it only corrects too much or nothing, which also isn't ideal for training.
 
-First, ADALINE changes the error calculation format, instead of the previously described one, we are going to use what is called the mean squared error. This one can change the weights of the neuron even when it's corrected. Which creates a more optimized training system.
+First, ADALINE changes the error calculation format, instead of the previously described one, we are going to use what is called the mean squared error. This one can change the weights of the neuron even when it have the correct values. Which creates a more optimized training system.
+
+his system also outputs continuous values, which is completely different from the perceptron that gave a binary result (the threshold only comes back at the very end if you actually need a yes/no). A good example of neuron function that is in ADALINE scope is noise cancelation, which get the frequency input and the output is the frequency that should be emited to neutralize. 
 
 ### Squared error and MSE
 
@@ -93,18 +95,54 @@ This graph represents the influence of the weights in the inputs when compared t
 
 As said before, we are looking for the lowest point in the vertical axis that has the lowest value for the sum of error, which means the best pair of weights for every input possible or even the optimal function. The name of this lowest point is minima. 
 
-<details>
-<summary>Curiosity: when there's more than one minima</summary>
-
-In the case of ADALINA only a unique minima is possible, but in other situations you could have multiple bases or low points. Of course only one would be the lowest, which is called the global minima but could have other local minimas like this other plot:
-
-{{< figure src="/img/neural_net/multiple_minimas.png" 
-   alt="Error surface 1" 
-   caption="Figure 3 — Error surface, side view" 
-   align="center" >}}
-
-</details>
+In the case of ADALINA only a unique minima is possible because it's a exclusive convex problem, but in other situations you could have multiple bases/low points. Of course only one would be the lowest, which is called the global minima but could have other local minimas that's called local minima.
 
 >Cool view of neural networks is that all of it is just some optimization problem in which, given some input, we want to achieve the lowest error summing rates.
 
 ### Gradient Descent algorithm
+
+This algorithm is the union of the MSE with some tweaks to reach the minima. I really mean just minima because it works for convex and nonconvex problems, but in the last it is not garanted to reach the global minima.
+
+So, considering this plot:
+
+{{< figure src="/img/neural_net/gradient_desc.png" 
+   alt="Error surface 2" 
+   caption="Figure 2 — Error surface, side view with direction" 
+   align="center" >}}
+
+We can think again about earlier observations, we want to reach the minima but how do we use the MSE in the learning process? We already know looking at the plot what's the direction but how we generalize this and apply in some perceptron with more than 2 inputs.
+
+First let me put the MSE function here again:
+
+$$E(\hat{y}, y) = \frac{1}{n} \sum_{j=1}^{n} (\hat{y}_j - y_j)^2$$
+
+Think about that function, what if we could test the result of MSE if we slightly changed the weight? 
+
+If the MSE reduced means we are walking in the righ direction, if not we can go make the oposite weight change, like instead of increase we decrease it.
+
+There is a mathematical way of testing a function with the smallest possible value to get the answer we need. But it's gonna return us a new function which is always point to the steepest ascent. (Derivatives) Here is the mathematical show off:
+
+Start with the squared error function because we can change it at input value level, so it can optimize the weights even more specifically:
+
+$$L(w) = (y - \hat{y})^2$$
+
+Take the derivative with respect to the weight $w$:
+
+$$\frac{\partial L}{\partial w} = -2(y - \hat{y}) \cdot x$$
+
+This derivative tells us the direction in which $L$ increases fastest. Since we want $L$ to decrease, we step in the opposite direction by flipping the sign, also we are gonna call this derivative as the calculated gradient:
+
+$$w_{\text{new}} = w_{\text{old}} - \eta \, \Delta w$$
+
+So the resume is we got the error function, applied a propertie called derivation which tell us where the steepest ascent is and inverted it's value to run towards the lowest level which is a minima (local for ADALINE and maybe global for nonconvex optimization problems).
+
+Reminder that the \(\eta \) is just the learning rate which we want. If it's too big it will start jumping around and if is too small it will take too much time to reach the optimal goal, as we can see in the image:
+
+{{< figure src="/img/neural_net/learning_rate.png" 
+   alt="Learning rate" 
+   caption="Figure 4 — Learning rate" 
+   align="center" >}}
+
+This way we just discovered the GRADIENT DESCENT algorithm, not that bad right?
+
+## Multilayer perceptron
