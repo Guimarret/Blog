@@ -1,0 +1,6 @@
+{{- /* Head custom content area start */ -}}
+{{- /*     Overrides the theme's empty extend_head.html. */ -}}
+{{- if or .Params.math .Site.Params.math }}
+{{- partialCached "math.html" . }}
+{{- end }}
+{{- /* Head custom content area end */ -}}
