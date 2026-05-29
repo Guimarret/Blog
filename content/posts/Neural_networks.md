@@ -14,7 +14,10 @@ I'm going to try to cover everything from zero to present. I am not sure if it w
 ## Perceptron
 You can think of the perceptron as being the start of neural network applications. It was published in 1958 and explained how we could train artificial neurons to output desired data. The idea is pretty simple, it takes inputs of some type, and based on some parameters and thresholds, it outputs something with the desired behavior.
 
-![perceptron](/img/neural_net/perceptron.png)
+{{< figure src="/img/neural_net/perceptron.png"
+   alt="Diagram of a perceptron: weighted inputs feeding into a summation and a threshold function"
+   caption="Figure 1 — The perceptron"
+   align="center" >}}
 
 Let's start with a simple example: If you want the neuron to activate (in a binary scenario) when and only when the sum of some inputs is equal to or bigger than 4, you can set the threshold function's minimum value to be 4 for the true case. False for the rest.
 
@@ -27,7 +30,10 @@ So in this case we have to change it little by little while testing to reach the
 It's kind of complicated to think about for the first time, but it makes sense. We don't care how the weights are set but only if the output is correct. So we have to provide a data source of example with the source of truth, like a datasheet with multiple lines, where each line will have 200 inputs and the desired result.
 Then create a function to change the weights individually based on the desired result so it becomes more propitious to get the correct answer.
 
-![formula_error_correct](/img/neural_net/learning_rates.png)
+{{< figure src="/img/neural_net/learning_rates_formula.png"
+   alt="Perceptron weight-update formula"
+   caption="Figure 2 — Perceptron weight-update rule"
+   align="center" >}}
 
 This function can look a bit odd, but it's simple. We have the new calculated value, the current weight that multiplies the input, the learning rate, the input at step time, the expected output at the step time, and the actual output the neuron produced at that step. The correction is driven by the difference between the expected and the actual output (expected − actual), so without comparing the two, there would be nothing to correct.
 
@@ -70,8 +76,12 @@ $$\hat{y} = w_1 b + w_2 x_1$$
 
 When we plot that (insert into a graph), we unlock some visual properties:
 
-![linear_function_for_errors](/img/neural_net/function_plot.jpg)
-[Plot source](https://com-cog-book.github.io/com-cog-book/features/adaline.html#Threshold-decision-function)
+{{< figure src="/img/neural_net/function_plot.jpg"
+   alt="Linear function plotted against data points, showing the best-fit line"
+   caption="Figure 3 — Linear function fit (linear regression)"
+   attr="Plot source"
+   attrlink="https://com-cog-book.github.io/com-cog-book/features/adaline.html#Threshold-decision-function"
+   align="center" >}}
 
 
 The vertical axis represents the predicted value, and the pink dots the expected values (the real values without the weights).
@@ -85,8 +95,8 @@ This represents the line that best fits the points in the Cartesian plane. Also 
 At the end of the day, when considering multiple inputs, we are looking for the “minimum” total squared errors (which is summed across all data points). So to demonstrate a real situation with two inputs (it's not possible to visualize more dimensions, too, so we are going to show everything from now on considering only two inputs and generalize for more inputs):
 
 {{< figure src="/img/neural_net/error_surface_1.png" 
-   alt="Error surface 1" 
-   caption="Figure 3 — Error surface, side view" 
+   alt="Convex error surface (bowl shape) over two weights" 
+   caption="Figure 4 — Error surface, side view" 
    align="center" >}}
 
 >In optimization maths this is a [convex optimization](https://en.wikipedia.org/wiki/Convex_optimization) problem.
@@ -106,8 +116,8 @@ This algorithm is the union of the MSE with some tweaks to reach the minima. I r
 So, considering this plot:
 
 {{< figure src="/img/neural_net/gradient_desc.png" 
-   alt="Error surface 2" 
-   caption="Figure 2 — Error surface, side view with direction" 
+   alt="Error surface with an arrow showing the descent direction toward the minimum" 
+   caption="Figure 5 — Error surface, side view with descent direction" 
    align="center" >}}
 
 We can think again about earlier observations, we want to reach the minima but how do we use the MSE in the learning process? We already know looking at the plot what's the direction but how we generalize this and apply in some perceptron with more than 2 inputs.
@@ -139,10 +149,45 @@ So the resume is we got the error function, applied a propertie called derivatio
 Reminder that the \(\eta \) is just the learning rate which we want. If it's too big it will start jumping around and if is too small it will take too much time to reach the optimal goal, as we can see in the image:
 
 {{< figure src="/img/neural_net/learning_rate.png" 
-   alt="Learning rate" 
-   caption="Figure 4 — Learning rate" 
+   alt="Effect of the learning rate: small steps converge slowly, large steps overshoot" 
+   caption="Figure 6 — Learning rate" 
    align="center" >}}
 
 This way we just discovered the GRADIENT DESCENT algorithm, not that bad right?
 
 ## Multilayer perceptron
+
+This point is a milestone in training models, perceptrons, etc. Because from now on we can train not only a threshold function that outputs binary and a continuous outputting function like the noise cancellation one but also a sigmoid function. This will open new horizons for learning procedures that use gradient descent at scale.
+
+So, let's dive into it. This image represents a multilayer perceptron, and as clearly represented, it has 3 parts: the input, hidden layers, and output.
+
+Not going to elaborate on the inputs and outputs because it's still the same. The hidden layer is everything between inputs and outputs usually they have more than 1 pair of these two on the same network.
+
+{{< figure src="/img/neural_net/multilayer_perceptron.png" 
+   alt="Multilayer perceptron: one simple hidden layer with linear and sigmoid functions" 
+   caption="Figure 7 — Multilayer perceptron" 
+   align="center" >}}
+
+We already talked about that, but as the figure shows, the LINEAR part represents the trainable pieces, which is where the weights adjust the values from the input, and this SIGMOID is the new term.
+
+The difference here is that we can put in multiple processing units, so from now on we can consider more neurons involved in the calculations. This also means that we can represent more complexity and granularity in the pattern it can learn. This has two direct implications: the possibility of having more accuracy and overfitting.
+
+### Overfit
+
+When models are trained or tested for some generalization feature, they use some dataset as a source. With that, we can make it follow the desired behavior, but we can't forget that at the end of the day we are searching for some pattern and trying to follow it. If we follow too much, we'll become specialized in this pattern instead of this _behavior_. This phenomenon is what we call overfit. The simplest solution to prevent the overfitting is to separate the dataset, usually 80/20, where 80 is the training data and 20 is the test data. Doing that, we can measure the MSE for both executions, the expected behavior is for the test to be slightly above the train I mean, have more error occurrency.
+
+
+
+![Overfitting animation showing polynomial fits from degree 1 to 15](/img/neural_net/overfitting.gif)
+
+
+Sigmoids are functions that have this S shape and have this base formula:
+
+$$\sigma(x) = \frac{1}{1 + e^{-x}}$$
+
+We can infer by looking for the formula that it has a range of 0 to 1 (the natural number $e$ when exponentiated, has a function like that).
+
+{{< figure src="/img/neural_net/euler_exp_plot.png" 
+   alt="Euler exponential plot" 
+   caption="Figure 8 — Euler exponential plot" 
+   align="center" >}}
