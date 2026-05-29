@@ -161,24 +161,35 @@ This point is a milestone in training models, perceptrons, etc. Because from now
 
 So, let's dive into it. This image represents a multilayer perceptron, and as clearly represented, it has 3 parts: the input, hidden layers, and output.
 
-Not going to elaborate on the inputs and outputs because it's still the same. The hidden layer is everything between inputs and outputs usually they have more than 1 pair of these two on the same network.
 
-{{< figure src="/img/neural_net/multilayer_perceptron.png" 
+{{< figure src="/img/neural_net/multilayer_perceptron.png" id="fig7"
    alt="Multilayer perceptron: one simple hidden layer with linear and sigmoid functions" 
    caption="Figure 7 — Multilayer perceptron" 
    align="center" >}}
 
-We already talked about that, but as the figure shows, the LINEAR part represents the trainable pieces, which is where the weights adjust the values from the input, and this SIGMOID is the new term.
+Not going to elaborate on the inputs and outputs because it's still the same. The hidden layer is like a block that consists of one or multiple linear and nonlinear functions on the same network. 
 
-The difference here is that we can put in multiple processing units, so from now on we can consider more neurons involved in the calculations. This also means that we can represent more complexity and granularity in the pattern it can learn. This has two direct implications: the possibility of having more accuracy and overfitting.
+>Recap: The linear function will change the values with the weights and the nonlinear functions will treat the value to be outputed (simple example here is the threshold function that will be yes if the value is from one point). Another perspective of linear and nonlinear is the graphic, the name already says everything, one will be a line and the other not, and by non linear you can think of curve or the thresholds.
+
+<details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click to see the plot comparison</summary>
+{{< figure src="/img/neural_net/linear_nonlinear_plot.png" alt="Linear and nonlinear plot" caption="Figure 8 — Linear and nonlinear plot" align="center" >}}
+</details>
+
+We already talked about that, but as figure 7 shows, the _linear_ part represents the trainable pieces, which is the weights adjustment to the values that's being passed.
+
+The news here is that we can put in multiple processing units, so from now on we can consider more neurons involved in the calculations. This also means that we can represent more complexity and granularity in the pattern it can learn. This has two direct implications: the possibility of having more accuracy and overfitting.
 
 ### Overfit
 
-When models are trained or tested for some generalization feature, they use some dataset as a source. With that, we can make it follow the desired behavior, but we can't forget that at the end of the day we are searching for some pattern and trying to follow it. If we follow too much, we'll become specialized in this pattern instead of this _behavior_. This phenomenon is what we call overfit. The simplest solution to prevent the overfitting is to separate the dataset, usually 80/20, where 80 is the training data and 20 is the test data. Doing that, we can measure the MSE for both executions, the expected behavior is for the test to be slightly above the train I mean, have more error occurrency.
+When models are trained or tested for some generalization feature, they use some dataset as a source. With that, we can make it follow the desired behavior, but we can't forget that at the end of the day we are searching for some pattern and trying to follow it. If we go too deeper, we'll become specialized in this pattern instead of this _behavior_. This phenomenon is what we call overfit. The simplest solution to prevent the overfitting is to separate the dataset, usually 80/20, where 80 is the training data and 20 is the test data. Doing that, we can measure the MSE for both executions, the expected behavior is for the train to be slightly above the test, I mean, have less error occurrency.
 
+>This gif is example of overfitting happening in polynomial regression, you can increase the polynomial level but eventually it becomes bounded to overfitting, them the _outlier_ which could be the training data will be left out. Our situation is similar, adding more neurons add granularity and accuracy but can converge in this behavior. In other words, reduce the chances of predicting if your roommate will _forget_ the dishes again for example.
 
-
-![Overfitting animation showing polynomial fits from degree 1 to 15](/img/neural_net/overfitting.gif)
+{{< figure src="/img/neural_net/overfitting.gif" 
+   alt="Overfitting animation showing polynomial fits from degree 1 to 15" 
+   caption="Figure 8 — Polynomial plot overfit" 
+   align="center" >}}
 
 
 Sigmoids are functions that have this S shape and have this base formula:
@@ -191,3 +202,5 @@ We can infer by looking for the formula that it has a range of 0 to 1 (the natur
    alt="Euler exponential plot" 
    caption="Figure 8 — Euler exponential plot" 
    align="center" >}}
+
+![Neural Networks](/img/neural_net/neural_networks.png)
