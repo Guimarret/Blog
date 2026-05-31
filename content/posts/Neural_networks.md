@@ -136,7 +136,7 @@ Start with the squared error function because we can change it at input value le
 
 $$L(w) = (y - \hat{y})^2$$
 
-Take the derivative with respect to the weight $w$:
+Take the derivative with respect to the weight $w$ also the $x$ here comes from the derivative of the predicted value $\hat{y}$ which is $w$.$x$:
 
 $$\frac{\partial L}{\partial w} = -2(y - \hat{y}) \cdot x$$
 
@@ -157,14 +157,14 @@ This way we just discovered the GRADIENT DESCENT algorithm, not that bad right?
 
 ## Multilayer perceptron
 
-This point is a milestone in training models, perceptrons, etc. Because from now on we can train not only a threshold function that outputs binary and a continuous outputting function like the noise cancellation one but also a sigmoid function. This will open new horizons for learning procedures that use gradient descent at scale.
+This point is a milestone in training models, perceptrons, etc. There are two reasons for that. The first is that stacking layers lets us represent patterns a single perceptron simply can't, since the hidden layer adds the depth needed to capture more complex relationships. The second is the activation function: until now we leaned on the threshold, but it's not differentiable, so it doesn't play well with gradient descent. The sigmoid fixes that, because it outputs a smooth range from 0 to 1 and, more importantly, it's differentiable, which is exactly what lets us run gradient descent (and later backpropagation) across multiple layers. This will open new horizons for learning procedures that use gradient descent at scale.
 
 So, let's dive into it. This image represents a multilayer perceptron, and as clearly represented, it has 3 parts: the input, hidden layers, and output.
 
 
 {{< figure src="/img/neural_net/multilayer_perceptron.png" id="fig7"
    alt="Multilayer perceptron: one simple hidden layer with linear and sigmoid functions" 
-   caption="Figure 7 — Multilayer perceptron" 
+   caption="Figure 7 - Multilayer perceptron" 
    align="center" >}}
 
 Not going to elaborate on the inputs and outputs because it's still the same. The hidden layer is like a block that consists of one or multiple linear and nonlinear functions on the same network. 
@@ -173,34 +173,91 @@ Not going to elaborate on the inputs and outputs because it's still the same. Th
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
 <summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click to see the plot comparison</summary>
-{{< figure src="/img/neural_net/linear_nonlinear_plot.png" alt="Linear and nonlinear plot" caption="Figure 8 — Linear and nonlinear plot" align="center" >}}
+{{< figure src="/img/neural_net/linear_nonlinear_plot.png" alt="Linear and nonlinear plot" caption="Figure 8 - Linear and nonlinear plot" align="center" >}}
 </details>
 
-We already talked about that, but as figure 7 shows, the _linear_ part represents the trainable pieces, which is the weights adjustment to the values that's being passed.
+We already talked about that, but as Figure 7 shows, the _linear_ part represents the trainable pieces, which is the weight adjustment to the values that are being passed.
 
 The news here is that we can put in multiple processing units, so from now on we can consider more neurons involved in the calculations. This also means that we can represent more complexity and granularity in the pattern it can learn. This has two direct implications: the possibility of having more accuracy and overfitting.
 
 ### Overfit
 
-When models are trained or tested for some generalization feature, they use some dataset as a source. With that, we can make it follow the desired behavior, but we can't forget that at the end of the day we are searching for some pattern and trying to follow it. If we go too deeper, we'll become specialized in this pattern instead of this _behavior_. This phenomenon is what we call overfit. The simplest solution to prevent the overfitting is to separate the dataset, usually 80/20, where 80 is the training data and 20 is the test data. Doing that, we can measure the MSE for both executions, the expected behavior is for the train to be slightly above the test, I mean, have less error occurrency.
+When models are trained or tested for some generalization feature, they use some dataset as a source. With that, we can make it follow the desired behavior, but we can't forget that at the end of the day we are searching for some pattern and trying to follow it. If we go too deep, we'll become specialized in this pattern instead of this _behavior_. This phenomenon is what we call overfit. The simplest solution to prevent overfitting is to separate the dataset, usually 80/20, where 80 is the training data and 20 is the test data. Doing that, we can measure the MSE for both executions. The expected behavior is for the train to be slightly above the test, I mean, have less error occurrence (the MSE can also be called the _Loss_ function).
 
->This gif is example of overfitting happening in polynomial regression, you can increase the polynomial level but eventually it becomes bounded to overfitting, them the _outlier_ which could be the training data will be left out. Our situation is similar, adding more neurons add granularity and accuracy but can converge in this behavior. In other words, reduce the chances of predicting if your roommate will _forget_ the dishes again for example.
+>This gif is example of overfitting happening in polynomial regression, you can increase the polynomial level but eventually it becomes bounded to overfitting, them the _outlier_ which could be the training data will be left out. Our situation is similar, adding more neurons add granularity and accuracy but can converge in this behavior. In other words, reduce the chances of correctly predicting if your roommate will _forget_ the dishes again.
 
 {{< figure src="/img/neural_net/overfitting.gif" 
    alt="Overfitting animation showing polynomial fits from degree 1 to 15" 
-   caption="Figure 8 — Polynomial plot overfit" 
+   caption="Figure 9- Polynomial plot overfit" 
    align="center" >}}
 
+## Activations | Sigmoids
 
-Sigmoids are functions that have this S shape and have this base formula:
+The sigmoids, also called _activation_ , will be the nonlinear function that will add the expressiveness for our models.
+
+You can see it logically. If a value is changed by weights, you can't just change it again without anything in between because it would collapse as one effective multiplication. When testing the model, the value passed in the neuron will be changed twice, and that's all. So we lose the sensitivity of knowing what changed for this specific neuron weight change. For example, 1 x 0.5 x 0.1 is the same as 1 x 0.05.
+
+To change that, we use the nonlinear functions, in this case the sigmoid, but it could be _tanh_ or _ReLU_. These functions will create a bend in the chain between weight changes, so we gain the granularity of two changes, and we can compare two weight changes to outputted value/desired output value.
+
+<details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click to see the math demonstration</summary>
+
+Suppose we have two linear functions:
+
+$$f(x) = w_1 x + b_1$$
+
+$$g(x) = w_2 x + b_2$$
+
+Now let's compose them - feed the output of $f$ into $g$:
+
+$$g(f(x)) = w_2 \cdot f(x) + b_2$$
+
+$$g(f(x)) = w_2 \cdot (w_1 x + b_1) + b_2$$
+
+$$g(f(x)) = w_2 w_1 x + w_2 b_1 + b_2$$
+
+Let $W = w_2 w_1$ and $B = w_2 b_1 + b_2$. The composed function becomes:
+
+$$g(f(x)) = W x + B$$
+</details>
+
+
+{{< figure src="/img/neural_net/why_the_activation.png" 
+   alt="Diagram showing why a nonlinear activation function is needed between linear layers" 
+   caption="Figure 10 - Why the activation function is needed" 
+   align="center" >}}
+
+The sigma function, as represented below, is a function that creates a range that fits every value, so it doesn't matter whether it's bigger or smaller, it will squash everything between 0 and 1. Also, a good use case would be the chance of activation for example, when the value is bigger, it is “more probable” of activating. When we are talking about training, this can mean almost anything, but imagine the chance of some part of the image being straight or curved. When a group of neurons specialized in detecting curves outputs values above 0.90, together they signal that the image contains a curve.
 
 $$\sigma(x) = \frac{1}{1 + e^{-x}}$$
 
-We can infer by looking for the formula that it has a range of 0 to 1 (the natural number $e$ when exponentiated, has a function like that).
+This is the graph plot of this function:
 
-{{< figure src="/img/neural_net/euler_exp_plot.png" 
-   alt="Euler exponential plot" 
-   caption="Figure 8 — Euler exponential plot" 
+{{< figure src="/img/neural_net/sigma_plot.png" 
+   alt="Plot of the sigmoid function squashing values between 0 and 1" 
+   caption="Figure 11 - Sigmoid function plot" 
    align="center" >}}
 
-![Neural Networks](/img/neural_net/neural_networks.png)
+## Cost functions
+
+For the sake of simplicity, I was keeping just the MSE, but right now we can have some additional thoughts on that. Considering that training is an optimization problem, the way to measure the error can return different results depending on the output. If our optimization has to prioritize normal number outputs, the MSE is great, but if we want some binary classification, it doesn't work too well because of the activation function. The derivative of the sigmoid flattens every loss calculation that's too minimal or too big. If we consider some prediction that the correct answer is 1 and it outputted 0.01, the error is massive but will be invisible after the derivative of the sigmoid. The same happens if the error is minimal or the value is probably correct. The change in the actual optimization is negligible. The plot below shows the effects side by side.
+
+>Recap: Derivatives points to the steepest ascent. The derivative of the sigmoid correction will only make a difference if the value is _existent_.
+
+{{< figure src="/img/neural_net/derivative_sigmoid.png" 
+   alt="Sigmoid and its derivative plotted side by side, the derivative peaking near zero and flattening at the tails" 
+   caption="Figure 12 - Derivative of the sigmoid" 
+   align="center" >}}
+
+With this we can imply that the sigmoids shouldn't be used for linear and continuous values while keeping the MSE (mean square error), because the training can be ineffective in the low and high gap. While in binary classification, we should evict the use of MSE.
+
+You can ask me what we use them.
+
+### Binary cross entropy
+
+This loss function, which, contrary to the MSE, performs well in binary classifications.
+
+
+## Backpropagation algorithm
+
+<!-- ![Neural Networks](/img/neural_net/neural_networks.png) -->
