@@ -11,7 +11,7 @@ math: true
 
 I'm going to try to cover everything from zero to present. I am not sure if it will be too technical or anything like that, but I will try to make it focused on didactics. That said, let's start..
 
-## Perceptron
+# Perceptron
 You can think of the perceptron as being the start of neural network applications. It was published in 1958 and explained how we could train artificial neurons to output desired data. The idea is pretty simple, it takes inputs of some type, and based on some parameters and thresholds, it outputs something with the desired behavior.
 
 {{< figure src="/img/neural_net/perceptron.png"
@@ -45,7 +45,7 @@ But this fix in weight will happen for all the input weights at the same time. T
 
 So after all this mathematics and changing the weights of your perceptron, it becomes actually useful, and when you feed it new real-world data, it outputs with a good accuracy (what is good here depends on context because a probability of rain accuracy of 80% can be okay, I mean, if it misses in 20% of the cases is not the end of the world).  So now you can set up your tech house with multiple sensors and connect everything to your local PC to run and feed the Perceptron and know everything about the chances of your roommate “forgetting” to do the dishes again.
 
-## ADALINE
+# ADALINE
 >I was pondering going directly to multilayer perceptron and explaining backpropagation there. But it would be missing something, so I think ADALINE is a good context bridge. 
 This topic will be a bit math-heavy, so take your time to understand and digest the topics. I'm not going to bring anything outside basic math without a proper explanation of what it is and how it works. Some graph visualization will be necessary for simplification, so be ready.
 
@@ -111,7 +111,7 @@ In the case of ADALINA only a unique minima is possible because it's a exclusive
 
 ### Gradient Descent algorithm
 
-This algorithm is the union of the MSE with some tweaks to reach the minima. I really mean just minima because it works for convex and nonconvex problems, but in the last it is not garanted to reach the global minima.
+This algorithm is the union of the Loss function(MSE) with some tweaks to reach the minima. I really mean just minima because it works for convex and nonconvex problems, but in the last it is not garanted to reach the global minima.
 
 So, considering this plot:
 
@@ -155,7 +155,7 @@ Reminder that the \(\eta \) is just the learning rate which we want. If it's too
 
 This way we just discovered the GRADIENT DESCENT algorithm, not that bad right?
 
-## Multilayer perceptron
+# Multilayer perceptron
 
 This point is a milestone in training models, perceptrons, etc. There are two reasons for that. The first is that stacking layers lets us represent patterns a single perceptron simply can't, since the hidden layer adds the depth needed to capture more complex relationships. The second is the activation function: until now we leaned on the threshold, but it's not differentiable, so it doesn't play well with gradient descent. The sigmoid fixes that, because it outputs a smooth range from 0 to 1 and, more importantly, it's differentiable, which is exactly what lets us run gradient descent (and later backpropagation) across multiple layers. This will open new horizons for learning procedures that use gradient descent at scale.
 
@@ -191,7 +191,7 @@ When models are trained or tested for some generalization feature, they use some
    caption="Figure 9- Polynomial plot overfit" 
    align="center" >}}
 
-## Activations | Sigmoids
+## Activations | Sigmoids $\phi$
 
 The sigmoids, also called _activation_ , will be the nonlinear function that will add the expressiveness for our models.
 
@@ -238,7 +238,7 @@ This is the graph plot of this function:
    caption="Figure 11 - Sigmoid function plot" 
    align="center" >}}
 
-## Cost functions
+## Cost functions $\mathcal{L}$
 
 For the sake of simplicity, I was keeping just the MSE, but right now we can have some additional thoughts on that. Considering that training is an optimization problem, the way to measure the error can return different results depending on the output. If our optimization has to prioritize normal number outputs, the MSE is great, but if we want some binary classification, it doesn't work too well because of the activation function. The derivative of the sigmoid flattens every loss calculation that's too minimal or too big. If we consider some prediction that the correct answer is 1 and it outputted 0.01, the error is massive but will be invisible after the derivative of the sigmoid. The same happens if the error is minimal or the value is probably correct. The change in the actual optimization is negligible. The plot below shows the effects side by side.
 
@@ -251,13 +251,115 @@ For the sake of simplicity, I was keeping just the MSE, but right now we can hav
 
 With this we can imply that the sigmoids shouldn't be used for linear and continuous values while keeping the MSE (mean square error), because the training can be ineffective in the low and high gap. While in binary classification, we should evict the use of MSE.
 
-You can ask me what we use them.
+So the solution for binary classification is:
 
 ### Binary cross entropy
 
-This loss function, which, contrary to the MSE, performs well in binary classifications.
+This loss function, contrary to the MSE, performs well in binary classifications. 
 
+>Recap: the $\hat{Y}_i$ is the predicted value and the $Y_i$ is the true label/correct value from the training dataset.
+
+> We will always use the negative log because numbers will always range 0 and 1 and this range always returns negative log but still super convenient for quantitative measuring in our case.
+
+>Math reminder $log(1) = 0$ and $log(0) = -\infty$
+
+$$ - (Y_i \cdot \log \hat{Y}_i + (1 - Y_i) \cdot \log(1 - \hat{Y}_i))$$
+
+<details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to see the explanation to why 0 and 1 is not going to show up</summary>
+It could be a problem if we get the predicted value equals 0 or 1 but remember that the cost functions are calculated considering all the linear and nonlinear steps from the network and as I said before for binary classifications the activation function is higly recommeded (this case again I'm gonna cover only the sigmoid) and the output range is 0 and 1, mathematically it never reachs these values (system can round the number to 0 or 1 if is too close but training algorithms usually caps at a really small value to avoid this situation, because if you try to compute $log(0)$ it's gonna get a NAN error and the same goes on for number too close to 1) so we are safe.
+</details>
+
+Let's split the function in two parts:
+
+$$ - (Y_i \cdot \log \hat{Y}_i)$$
+
+This one I'm gonna call that the positive part. Here we calculate how well the network predicted the positive class when the answer really was close to 1, because the if the correct value is 1 it will mutiply the log calculated by one, therefore consider 100% of the $log \hat{Y}_i$, so it attach something like a weight for the how much this error measure is important for positive values.
+
+While in the other part (the negative one) it calculated how well the network predicted the negative class when the answer was close to 0. We multiply the log of $1 - \hat{Y}_i$ (one minus the predicted value) times $1 - Y_i$ because it will multiply 100% of the log only if the $Y_i$ (expected value) is 0 otherwise it will remove the importancy of the calculated log of $1 - \hat{Y}_i$.
+
+$$- ((1 - Y_i) \cdot \log(1 - \hat{Y}_i))$$
+
+This table show the relation of the sliced parts when put together:
+
+| True label $Y$ | Part A | Part B | Active formula |
+|---|---|---|---|
+| 1 | $\log(\hat{Y})$ | 0 | $\mathcal{L} = -\log(\hat{Y})$ |
+| 0 | 0 | $\log(1 - \hat{Y})$ | $\mathcal{L} = -\log(1 - \hat{Y})$ |
+
+And the plot relation is this:
+
+{{< figure src="/img/neural_net/binary_cross_entropy_plot_agg.png" 
+   alt="Binary cross-entropy loss curves: the positive-class term, the negative-class term, and their aggregate plotted against the predicted value" 
+   caption="Figure 13 - Cross entropy plot for positive, negative and agg" 
+   align="center" >}}
+
+Also for the optimizing part, it becomes as simples as the MSE
+
+<details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to math steps of this derivation</summary>
+$$
+\mathcal{L} = -\left[ Y \log \hat{Y} + (1 - Y) \log(1 - \hat{Y}) \right]
+$$
+
+$$
+\frac{\partial \mathcal{L}}{\partial \hat{Y}} = \frac{\partial}{\partial \hat{Y}} \left[ -Y \log \hat{Y} \right] + \frac{\partial}{\partial \hat{Y}} \left[ -(1-Y) \log(1 - \hat{Y}) \right]
+$$
+
+$$
+= -\frac{Y}{\hat{Y}} + \frac{1-Y}{1 - \hat{Y}}
+$$
+
+$$
+= \frac{-Y(1 - \hat{Y}) + (1-Y)\hat{Y}}{\hat{Y}(1 - \hat{Y})}
+$$
+
+$$
+= \frac{-Y + Y\hat{Y} + \hat{Y} - Y\hat{Y}}{\hat{Y}(1 - \hat{Y})}
+$$
+
+$$
+\frac{\partial \mathcal{L}}{\partial \hat{Y}} = \frac{\hat{Y} - Y}{\hat{Y}(1 - \hat{Y})}
+$$
+</details>
+
+We calculate the derivative of the binary cross entropy to finde the gradient descent and find the steepest ascent. Then just use the negative of this result to find the steepest descent which is the optimal scenario to reduce the _Loss_:
+
+$$\frac{\partial \mathcal{L}}{\partial \hat{Y}} = \frac{\hat{Y} - Y}{\hat{Y}(1 - \hat{Y})}$$
 
 ## Backpropagation algorithm
+
+Now for the actual training, we already know how to apply the gradient descent using two functions (mean square error, binary cross entropy) in unique weights situation but what about multilayer and multineuron?
+
+Let's start visualizing a multineuron example:
+
+{{< figure src="/img/neural_net/multineuron.png" 
+   alt="Multineuron: visualization with 2 hidden layers, 3 weights and bias with function of z and activation bellow" 
+   caption="Figure 14 - Multineuron visualization" 
+   align="center" >}}
+
+Here we can find a neuron with 2 hidden layers, both with activation function and the output also with activation function, there are 3 weights in the diagram and arrows pointing where each one fit in the value at point L function.
+
+This value after weight and bias calculation $z^{(L)}$ at point L when submited to the function $f(z^{(L)})$ evaluates as $a^{(L)}$.
+
+This $f()$ function is just a placeholder for any function, usually activation functions $\phi$ but can be used as identity functions (which does nothing so it only compact the weights from both sizes as we talked before) too in case of MSE regressions.
+
+With these functions and the draw in mind:
+
+$$z^{(L)} = w^{(L)} a^{(L-1)} + b^{(L)}$$
+
+$$a^{(L)} = f(z^{(L)})$$
+
+This is the sequence from input to the output:
+
+$$x \to z^{(L-2)} \to a^{(L-2)} \to z^{(L-1)} \to a^{(L-1)} \to z^{(L)} \to a^{(L)}$$
+
+>And here we start to cook the backpropagation idea, think that we want to make the system more optimized aka change the weights to increase the accuracy, push the output towards our goals and how do we do that? Exactly, apply derivatives to the find the steepest ascent again and apply with negative signal, because as I said before, doing that we are reducing the Loss ($\mathcal{L}$) and walking towards the lowest ascent.
+
+
+
+$$\frac{\partial \mathcal{L}}{\partial x} = \frac{\partial z^{(L-2)}}{\partial x} \cdot \frac{\partial a^{(L-2)}}{\partial z^{(L-2)}} \cdot \frac{\partial z^{(L-1)}}{\partial a^{(L-2)}} \cdot \frac{\partial a^{(L-1)}}{\partial z^{(L-1)}} \cdot \frac{\partial z^{(L)}}{\partial a^{(L-1)}} \cdot \frac{\partial a^{(L)}}{\partial z^{(L)}} \cdot \frac{\partial \mathcal{L}}{\partial a^{(L)}}$$
+
+<!-- ## Stochastic Gradient Descent -->
 
 <!-- ![Neural Networks](/img/neural_net/neural_networks.png) -->
