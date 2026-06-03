@@ -7,8 +7,6 @@ math: true
 
 >I just had a uni class about natural language processing and it lit up the need to write about to reinforce my learning in the topic
 
-# Foundations
-
 I'm going to try to cover everything from zero to present. I am not sure if it will be too technical or anything like that, but I will try to make it focused on didactics. That said, let's start..
 
 # Perceptron
