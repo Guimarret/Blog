@@ -157,7 +157,7 @@ This way we just discovered the GRADIENT DESCENT algorithm, not that bad right?
 
 # Multilayer perceptron
 
-This point is a milestone in training models, perceptrons, etc. There are two reasons for that. The first is that stacking layers lets us represent patterns a single perceptron simply can't, since the hidden layer adds the depth needed to capture more complex relationships. The second is the activation function: until now we leaned on the threshold, but it's not differentiable, so it doesn't play well with gradient descent. The sigmoid fixes that, because it outputs a smooth range from 0 to 1 and, more importantly, it's differentiable, which is exactly what lets us run gradient descent (and later backpropagation) across multiple layers. This will open new horizons for learning procedures that use gradient descent at scale.
+This point is a milestone in training models, perceptrons, etc. There are two reasons for that. The first is that stacking layers lets us represent patterns a single perceptron simply can't, since the hidden layer adds the depth needed to capture more complex relationships. The second is the activation function: until now we leaned on the threshold, but it's not differentiable, so it doesn't play well with gradient descent. The sigmoid fixes that because it outputs a smooth range from 0 to 1, and, more importantly, it's differentiable, which is precisely what lets us run gradient descent (and later backpropagation) across multiple layers. This will open new horizons for learning procedures that use gradient descent at scale.
 
 So, let's dive into it. This image represents a multilayer perceptron, and as clearly represented, it has 3 parts: the input, hidden layers, and output.
 
@@ -193,11 +193,11 @@ When models are trained or tested for some generalization feature, they use some
 
 ## Activations | Sigmoids $\phi$
 
-The sigmoids, also called _activation_ , will be the nonlinear function that will add the expressiveness for our models.
+The sigmoids, also called _activation_ , will be the nonlinear function that will add expressiveness to our models.
 
 You can see it logically. If a value is changed by weights, you can't just change it again without anything in between because it would collapse as one effective multiplication. When testing the model, the value passed in the neuron will be changed twice, and that's all. So we lose the sensitivity of knowing what changed for this specific neuron weight change. For example, 1 x 0.5 x 0.1 is the same as 1 x 0.05.
 
-To change that, we use the nonlinear functions, in this case the sigmoid, but it could be _tanh_ or _ReLU_. These functions will create a bend in the chain between weight changes, so we gain the granularity of two changes, and we can compare two weight changes to outputted value/desired output value.
+To change that, we use the nonlinear functions, in this case the sigmoid, but it could be _tanh_ or _ReLU_. These functions will create a bend in the chain between weight changes, so we gain the granularity of two changes, and we can compare two weight changes to the outputted value/desired output value.
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
 <summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click to see the math demonstration</summary>
@@ -266,21 +266,21 @@ This loss function, contrary to the MSE, performs well in binary classifications
 $$ - (Y_i \cdot \log \hat{Y}_i + (1 - Y_i) \cdot \log(1 - \hat{Y}_i))$$
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
-<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to see the explanation to why 0 and 1 is not going to show up</summary>
-It could be a problem if we get the predicted value equals 0 or 1 but remember that the cost functions are calculated considering all the linear and nonlinear steps from the network and as I said before for binary classifications the activation function is higly recommeded (this case again I'm gonna cover only the sigmoid) and the output range is 0 and 1, mathematically it never reachs these values (system can round the number to 0 or 1 if is too close but training algorithms usually caps at a really small value to avoid this situation, because if you try to compute $log(0)$ it's gonna get a NAN error and the same goes on for number too close to 1) so we are safe.
+<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to see the explanation of why 0 and 1 are not going to show up</summary>
+It could be a problem if we get the predicted value equal to 0 or 1, but remember that the cost functions are calculated considering all the linear and nonlinear steps from the network. As I said before, for binary classifications, the activation function is highly recommended (in this case again I'm going to cover only the sigmoid), and the output range is 0 and 1. Mathematically, it never reaches these values (the system can round the number to 0 or 1 if it is too close, but training algorithms usually cap at a minimal value to avoid this situation). If you try to compute $log(0)$, it's going to get a NAN error, and the same goes for numbers too close to 1, so we are safe.
 </details>
 
-Let's split the function in two parts:
+Let's split the function into two parts:
 
 $$ - (Y_i \cdot \log \hat{Y}_i)$$
 
-This one I'm gonna call that the positive part. Here we calculate how well the network predicted the positive class when the answer really was close to 1, because the if the correct value is 1 it will mutiply the log calculated by one, therefore consider 100% of the $log \hat{Y}_i$, so it attach something like a weight for the how much this error measure is important for positive values.
+This one I'll call the positive part. Here we calculate how well the network predicted the positive class when the answer really was close to 1, because if the correct value is 1, it will multiply the log calculated by one. Therefore, consider 100% of the $log hatY_i$, so it attaches something like a weight for how much this error measure is important for positive values.
 
-While in the other part (the negative one) it calculated how well the network predicted the negative class when the answer was close to 0. We multiply the log of $1 - \hat{Y}_i$ (one minus the predicted value) times $1 - Y_i$ because it will multiply 100% of the log only if the $Y_i$ (expected value) is 0 otherwise it will remove the importancy of the calculated log of $1 - \hat{Y}_i$.
+While in the other part (the negative one), it calculated how well the network predicted the negative class when the answer was close to 0. We multiply the log of $1 - \hat{Y}_i$ (one minus the predicted value) times $1 - Y_i$ because it will multiply 100% of the log only if the $Y_i$ (expected value) is 0, otherwise, it will remove the importance of the calculated log of $1 - \hat{Y}_i$.
 
 $$- ((1 - Y_i) \cdot \log(1 - \hat{Y}_i))$$
 
-This table show the relation of the sliced parts when put together:
+This table shows the relation of the sliced parts when put together:
 
 | True label $Y$ | Part A | Part B | Active formula |
 |---|---|---|---|
@@ -291,13 +291,13 @@ And the plot relation is this:
 
 {{< figure src="/img/neural_net/binary_cross_entropy_plot_agg.png" 
    alt="Binary cross-entropy loss curves: the positive-class term, the negative-class term, and their aggregate plotted against the predicted value" 
-   caption="Figure 13 - Cross entropy plot for positive, negative and agg" 
+   caption="Figure 13 - Cross entropy plot for positive, negative, and agg" 
    align="center" >}}
 
-Also for the optimizing part, it becomes as simples as the MSE
+Also for the optimizing part, it becomes as simple as the MSE.
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
-<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to math steps of this derivation</summary>
+<summary style="cursor: pointer; font-weight: 500; color: #000000;"> ⁣Click if you want to see the math steps of this derivation</summary>
 $$
 \mathcal{L} = -\left[ Y \log \hat{Y} + (1 - Y) \log(1 - \hat{Y}) \right]
 $$
@@ -323,26 +323,26 @@ $$
 $$
 </details>
 
-We calculate the derivative of the binary cross entropy to finde the gradient descent and find the steepest ascent. Then just use the negative of this result to find the steepest descent which is the optimal scenario to reduce the _Loss_:
+We calculate the derivative of the binary cross-entropy to find the gradient descent and find the steepest ascent. Then just use the negative of this result to find the steepest descent, which is the optimal scenario to reduce the _Loss_:
 
 $$\frac{\partial \mathcal{L}}{\partial \hat{Y}} = \frac{\hat{Y} - Y}{\hat{Y}(1 - \hat{Y})}$$
 
 ## Backpropagation algorithm
 
-Now for the actual training, we already know how to apply the gradient descent using two functions (mean square error, binary cross entropy) in unique weights situation but what about multilayer and multineuron?
+Now for the actual training, we already know how to apply the gradient descent using two functions (mean square error, binary cross-entropy) in a unique weight situation, but what about multilayer and multineuron?
 
 Let's start visualizing a multineuron example:
 
 {{< figure src="/img/neural_net/multineuron.png" 
-   alt="Multineuron: visualization with 2 hidden layers, 3 weights and bias with function of z and activation bellow" 
+   alt="Multineuron: visualization with 2 hidden layers, 3 weights, and bias with function of z and activation below" 
    caption="Figure 14 - Multineuron visualization" 
    align="center" >}}
 
-Here we can find a neuron with 2 hidden layers, both with activation function and the output also with activation function, there are 3 weights in the diagram and arrows pointing where each one fit in the value at point L function.
+Here we can find a neuron with 2 hidden layers, both with an activation function and the output also with an activation function. There are 3 weights in the diagram and arrows pointing where each one fits in the value at point L function.
 
-This value after weight and bias calculation $z^{(L)}$ at point L when submited to the function $f(z^{(L)})$ evaluates as $a^{(L)}$.
+This value after weight and bias calculation $z^{(L)}$ at point L when submitted to the function $f(z^{(L)})$ evaluates as $a^{(L)}$.
 
-This $f()$ function is just a placeholder for any function, usually activation functions $\phi$ but can be used as identity functions (which does nothing so it only compact the weights from both sizes as we talked before) too in case of MSE regressions.
+This $f()$ function is just a placeholder for any function, usually activation functions $\phi$, but can be used as identity functions (which do nothing so it only compacts the weights from both sides as we talked before) too in case of MSE regressions.
 
 With these functions and the draw in mind:
 
