@@ -132,11 +132,11 @@ There is a mathematical way of testing a function with the smallest possible val
 
 Start with the squared error function because we can change it at input value level, so it can optimize the weights even more specifically:
 
-$$L(w) = (y - \hat{y})^2$$
+$$L(w) = (\hat{y} - y)^2$$
 
 Take the derivative with respect to the weight $w$ also the $x$ here comes from the derivative of the predicted value $\hat{y}$ which is $w$.$x$:
 
-$$\frac{\partial L}{\partial w} = -2(y - \hat{y}) \cdot x$$
+$$\frac{\partial L}{\partial w} = 2(\hat{y} - y) \cdot x$$
 
 This derivative tells us the direction in which $L$ increases fastest. Since we want $L$ to decrease, we step in the opposite direction by flipping the sign, also we are gonna call this derivative as the calculated gradient:
 
@@ -338,7 +338,7 @@ Let's start visualizing a multineuron example:
 
 Here we can find a neuron with 2 hidden layers, both with an activation function and the output also with an activation function. There are 3 weights in the diagram and arrows pointing where each one fits in the value at point L function.
 
-This value after weight and bias calculation $z^{(L)}$ at point L when submitted to the function $f(z^{(L)})$ evaluates as $a^{(L)}$.
+The variable $z^{(L)}$ is the value being passed after weight and bias calculation at point L when submitted to the function $f(z^{(L)})$ is $a^{(L)}$.
 
 This $f()$ function is just a placeholder for any function, usually activation functions $\phi$, but can be used as identity functions (which do nothing so it only compacts the weights from both sides as we talked before) too in case of MSE regressions.
 
@@ -352,12 +352,62 @@ This is the sequence from input to the output:
 
 $$x \to z^{(L-2)} \to a^{(L-2)} \to z^{(L-1)} \to a^{(L-1)} \to z^{(L)} \to a^{(L)}$$
 
->And here we start to cook the backpropagation idea, think that we want to make the system more optimized aka change the weights to increase the accuracy, push the output towards our goals and how do we do that? Exactly, apply derivatives to the find the steepest ascent again and apply with negative signal, because as I said before, doing that we are reducing the Loss ($\mathcal{L}$) and walking towards the lowest ascent.
+And this is the feedforward where the values passes one time and them proceed to training based on error.
 
+>Now we start to cook the backpropagation idea, think that we want to make the system more optimized aka change the weights to increase the accuracy, push the output towards our goals and how do we do that? Apply derivatives to find the steepest ascent for each layer. I'm gonna use as example the MSE as error function to simplify the steps (the binary cross entropy add a bit too much visual noise).
 
+> We are not gonna use activation function so I'm obfuscating the $a$ for the $z$ directly, so consider the $z^{(L)} = w^{(L)} z^{(L-1)} + b^{(L)}$
 
-$$\frac{\partial \mathcal{L}}{\partial x} = \frac{\partial z^{(L-2)}}{\partial x} \cdot \frac{\partial a^{(L-2)}}{\partial z^{(L-2)}} \cdot \frac{\partial z^{(L-1)}}{\partial a^{(L-2)}} \cdot \frac{\partial a^{(L-1)}}{\partial z^{(L-1)}} \cdot \frac{\partial z^{(L)}}{\partial a^{(L-1)}} \cdot \frac{\partial a^{(L)}}{\partial z^{(L)}} \cdot \frac{\partial \mathcal{L}}{\partial a^{(L)}}$$
+<details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+<summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to see the math without hiding the $a$</summary>
+The $f$ is the identity function which does nothing but still is the activation function
 
-<!-- ## Stochastic Gradient Descent -->
+So, consider $a^{(L)} = f(z^{(L)})$:
 
+$$\frac{\partial a^{(L)}}{\partial z^{(L)}} = f'(z^{(L)})$$
+
+$$\nabla^{(L)} = 2(a^{(L)} - y) \cdot f'(z^{(L)})$$
+</details>
+
+For the _Loss_ function we use (the per example version don't divide by $n$) $MSE= (z^{(L)} - y)^2$ and if we look to the $z^{(L)}$ we can see that is dependent to the $z$ from the last layer so let's insert all $z$ till the input in the function to simplify and get the cost ($\mathcal{L}$):
+
+$$\mathcal{L} = \left( w^{(L)} \cdot w^{(L-1)} \cdot w^{(L-2)} \cdot x - y \right)^2$$
+
+The derivative of the cost, which will be gradient descent after apply the negative signal:
+$$\frac{\partial \mathcal{L}}{\partial x} = w^{(L-2)} \cdot w^{(L-1)} \cdot w^{(L)} \cdot 2(z^{(L)} - y)$$
+
+The completely open version after the derivative calculation:
+$$\frac{\partial \mathcal{L}}{\partial x} = w^{(L-2)} \cdot w^{(L-1)} \cdot w^{(L)} \cdot 2(w^{(L)} \cdot w^{(L-1)} \cdot w^{(L-2)} \cdot x - y)$$
+
+>Calling the result of the derivative the delta $\nabla^{(L)}$, so:
+
+$$\nabla^{(L)} = \frac{\partial \mathcal{L}}{\partial x}$$
+
+To apply the learning function in the $w^{(L)}$ (weight) from the last conection based on it's influence on the output, we use the already calculated delta $\nabla^{(L)}$ to multiple it (of course with the learning rate).
+
+$$w^{(L)}_{\text{new}} = w^{(L)}_{\text{old}} - \eta \cdot \nabla^{(L)}$$
+
+And then the actual backpropagation, which is applying that recursively, each layer's $\nabla$ is computed from the next layer's $\nabla$ times the weight connecting them. 
+
+$$\nabla^{(\ell-1)} = \nabla^{(\ell)} \cdot w^{(\ell)}$$ 
+
+If you think about it, the error signal at any layer depends on how wrong the layer in front of it was. So we walk backward through the network, each layer reusing the next layer's $\nabla$ to compute its own, but since each step multiplies by another weight (and another activation derivative if you're using one), the error signal shrinks as it travels backward. The output layer gets the biggest correction, and each earlier layer gets a smaller and smaller piece of it.
+
+The bias gradients are simpler than weight gradients, there's no input multiplier because biases aren't multiplied by anything in the forward pass:
+
+$$\frac{\partial \mathcal{L}}{\partial b^{(L)}} = \nabla^{(L)}$$
+
+>The bias gradient is the same only in identity activator that's the case here but in nonlinear activations it changes. 
+
+$$b^{(L)} = b^{(L)} - \eta \cdot \nabla^{(L)}$$
+
+### Nonlinear activations
+
+Here I'm just gonna show the same procedure but without obfuscating the activation.
+
+<!-- ## CNN -->
+
+<!-- RNN | LSTM-->
+
+<!-- Training at scale (Adam, AdamW) -->
 <!-- ![Neural Networks](/img/neural_net/neural_networks.png) -->
