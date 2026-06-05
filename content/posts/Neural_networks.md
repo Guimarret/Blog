@@ -371,21 +371,24 @@ $$\nabla^{(L)} = 2(a^{(L)} - y) \cdot f'(z^{(L)})$$
 
 For the _Loss_ function we use (the per example version don't divide by $n$) $MSE= (z^{(L)} - y)^2$ and if we look to the $z^{(L)}$ we can see that is dependent to the $z$ from the last layer so let's insert all $z$ till the input in the function to simplify and get the cost ($\mathcal{L}$):
 
-$$\mathcal{L} = \left( w^{(L)} \cdot w^{(L-1)} \cdot w^{(L-2)} \cdot x - y \right)^2$$
+$$\mathcal{L} = \left( w^{(L)} w^{(L-1)} w^{(L-2)} x + w^{(L)} w^{(L-1)} b^{(L-2)} + w^{(L)} b^{(L-1)} + b^{(L)} - y \right)^2$$
 
-The derivative of the cost, which will be gradient descent after apply the negative signal:
+Let's first take the derivative of the cost with respect to the input $x$, just to expose the shape of the chain, the gradient stands as a product of weights times the output error (we'll turn this into the actual weight and bias updates right after):
+
 $$\frac{\partial \mathcal{L}}{\partial x} = w^{(L-2)} \cdot w^{(L-1)} \cdot w^{(L)} \cdot 2(z^{(L)} - y)$$
 
-The completely open version after the derivative calculation:
-$$\frac{\partial \mathcal{L}}{\partial x} = w^{(L-2)} \cdot w^{(L-1)} \cdot w^{(L)} \cdot 2(w^{(L)} \cdot w^{(L-1)} \cdot w^{(L-2)} \cdot x - y)$$
+The completely open version after the derivative calculation (the biases are constants with respect to $x$, so they drop out of the leading weight product and only survive inside the residual):
+$$\frac{\partial \mathcal{L}}{\partial x} = w^{(L-2)} \cdot w^{(L-1)} \cdot w^{(L)} \cdot 2\left( w^{(L)} w^{(L-1)} w^{(L-2)} x + w^{(L)} w^{(L-1)} b^{(L-2)} + w^{(L)} b^{(L-1)} + b^{(L)} - y \right)$$
 
->Calling the result of the derivative the delta $\nabla^{(L)}$, so:
+>The innermost factor $2(z^{(L)} - y)$ is the only part that depends on the output error, everything in front of it is just the stacked chain of weights. That error factor is what we call the delta $\nabla^{(L)}$, and we anchor it at the layer's pre-activation $z^{(L)}$, not at the input $x$:
 
-$$\nabla^{(L)} = \frac{\partial \mathcal{L}}{\partial x}$$
+$$\nabla^{(L)} = \frac{\partial \mathcal{L}}{\partial z^{(L)}} = 2(z^{(L)} - y)$$
 
-To apply the learning function in the $w^{(L)}$ (weight) from the last conection based on it's influence on the output, we use the already calculated delta $\nabla^{(L)}$ to multiple it (of course with the learning rate).
+To actually update the weight $w^{(L)}$ from the last connection we need the gradient with respect to that weight, not with respect to $x$. Since $z^{(L)} = w^{(L)} z^{(L-1)} + b^{(L)}$, the chain gives the delta times the value that fed into the weight:
 
-$$w^{(L)}_{\text{new}} = w^{(L)}_{\text{old}} - \eta \cdot \nabla^{(L)}$$
+$$\frac{\partial \mathcal{L}}{\partial w^{(L)}} = \nabla^{(L)} \cdot z^{(L-1)}$$
+
+$$w^{(L)}_{\text{new}} = w^{(L)}_{\text{old}} - \eta \cdot \nabla^{(L)} \cdot z^{(L-1)}$$
 
 And then the actual backpropagation, which is applying that recursively, each layer's $\nabla$ is computed from the next layer's $\nabla$ times the weight connecting them. 
 
@@ -393,19 +396,69 @@ $$\nabla^{(\ell-1)} = \nabla^{(\ell)} \cdot w^{(\ell)}$$
 
 If you think about it, the error signal at any layer depends on how wrong the layer in front of it was. So we walk backward through the network, each layer reusing the next layer's $\nabla$ to compute its own, but since each step multiplies by another weight (and another activation derivative if you're using one), the error signal shrinks as it travels backward. The output layer gets the biggest correction, and each earlier layer gets a smaller and smaller piece of it.
 
-The bias gradients are simpler than weight gradients, there's no input multiplier because biases aren't multiplied by anything in the forward pass:
+The bias gradient is simpler than the weight gradient, there's no input multiplier because the bias isn't multiplied by anything in the forward pass ($\partial z^{(L)} / \partial b^{(L)} = 1$), so it's just the delta itself:
 
 $$\frac{\partial \mathcal{L}}{\partial b^{(L)}} = \nabla^{(L)}$$
 
->The bias gradient is the same only in identity activator that's the case here but in nonlinear activations it changes. 
+>The bias gradient equals the raw delta only because the activation here is the identity, in nonlinear activations the delta also carries the activation derivative. 
 
-$$b^{(L)} = b^{(L)} - \eta \cdot \nabla^{(L)}$$
+$$b^{(L)}_{\text{new}} = b^{(L)}_{\text{old}} - \eta \cdot \nabla^{(L)}$$
 
 ### Nonlinear activations
 
 Here I'm just gonna show the same procedure but without obfuscating the activation.
 
+So, consider $a^{(L)} = f(z^{(L)})$:
+
+$$\frac{\partial a^{(L)}}{\partial z^{(L)}} = f'(z^{(L)})$$
+
+The $f(z^{(L)})$ is the generalized function and cost function for this is going to be:
+
+$$\mathcal{L} = (a^{(L)} - y)^2$$
+
+And the completely opened version:
+
+$$\mathcal{L} = \Big( f\big(w^{(L)} \cdot f(w^{(L-1)} \cdot f(w^{(L-2)} \cdot x + b^{(L-2)}) + b^{(L-1)}) + b^{(L)}\big) - y \Big)^2$$
+
+Now the derivative version of the complete one and one more time it's the way we have to find the minima:
+
+$$\frac{\partial \mathcal{L}}{\partial x} = w^{(L-2)} \cdot f'(z^{(L-2)}) \cdot w^{(L-1)} \cdot f'(z^{(L-1)}) \cdot w^{(L)} \cdot f'(z^{(L)}) \cdot 2(a^{(L)} - y)$$
+
+We just did the same as before but instead of proceding just with the weights because of the activation functions that did nothing, here we open with the actual activation function. It works the same way at the end of the day. 
+
+The gradient for the last layer will be the same as the other one but instead of multiply just the weight no we multiply the whole derivative of the activation:
+
+$$\nabla^{(L)} = 2(a^{(L)} - y) \cdot f'(z^{(L)})$$
+
+And the next layer gradient will be similar to the simplified verison one, just added the obfuscated part but already derived $f'(z^{(L-1)})$
+
+>Pay attention to the ' in the $f'$ it means it's the derivative version of the function. 
+
+$$\nabla^{(L-1)} = \nabla^{(L)} \cdot w^{(L)} \cdot f'(z^{(L-1)})$$
+
+The complete process of weight updating within all phases will be similar to the simplified version too:
+
+$$\frac{\partial \mathcal{L}}{\partial w^{(L)}} = \nabla^{(L)} \cdot a^{(L-1)}$$
+
+$$\frac{\partial \mathcal{L}}{\partial w^{(L-1)}} = \nabla^{(L-1)} \cdot a^{(L-2)}$$
+
+$$\frac{\partial \mathcal{L}}{\partial w^{(L-2)}} = \nabla^{(L-2)} \cdot x$$
+
+The bias calculation is gonna be a bit differnte because the gradient will be different from the one from the function itself, because now the bias will also be part of the activation:
+
+$$\frac{\partial \mathcal{L}}{\partial b^{(L)}} = \nabla^{(L)}, \qquad \frac{\partial \mathcal{L}}{\partial b^{(L-1)}} = \nabla^{(L-1)}$$
+
+
+
+$$\frac{\partial \mathcal{L}}{\partial b^{(L)}} = 2(a^{(L)} - y) \cdot f'(z^{(L)})$$
+
+$$\frac{\partial \mathcal{L}}{\partial b^{(L-1)}} = 2(a^{(L)} - y) \cdot f'(z^{(L)}) \cdot w^{(L)} \cdot f'(z^{(L-1)})$$
+
+$$\frac{\partial \mathcal{L}}{\partial b^{(L-2)}} = 2(a^{(L)} - y) \cdot f'(z^{(L)}) \cdot w^{(L)} \cdot f'(z^{(L-1)}) \cdot w^{(L-1)} \cdot f'(z^{(L-2)})$$
+
 <!-- ## CNN -->
+
+
 
 <!-- RNN | LSTM-->
 
