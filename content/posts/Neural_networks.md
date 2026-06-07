@@ -7,6 +7,11 @@ math: true
 
 >I just had a uni class about natural language processing and it lit up the need to write about it to reinforce my learning in the topic
 
+Me 2 weeks in the future here, I didn't expect this post to become this big and didn't cover everything I wanted. In the future I'll also cover CNN, RNN, Transformer, and so on. After finishing this post, I thought maybe it's not for everyone because it became a bit too technical with heavy math (I gave my best in simplifying, but I still have a lot to learn,  this is the most I've written in one shot in my life until now). So for those who came here just to peek, here are some recommendations:
+- Want some visual reference and not much math? I recommend this [youtube playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi), the 1-3 videos will explain everything from this blog post but more friendly, and the didactics are flawless.
+- Some history is embedded in the content. My recommendation is this [page](https://com-cog-book.github.io/com-cog-book/features/roadmap-nn-mod-cog.html), which also walks similarly to mine in the math too, but it's a different pacing.
+- Generalist thing about machine learning in general i recommend this [site](https://www.byhand.ai/) from Professor Tom Yeh, he is spectacular and shows things in a way I never even imagined.
+
 I'm going to try to cover everything from zero to present. I am not sure if it will be too technical or anything like that, but I will try to make it focused on didactics. That said, let's start..
 
 # Perceptron
