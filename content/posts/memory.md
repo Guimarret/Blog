@@ -55,7 +55,7 @@ With that, we remove a problem of inconsistency state because both are off or on
 
 The difference here is that it has 3 inputs, and there are these _AND_ logic gates that lock the update to be based on the clock. From now on, it can be updated based on time and will accept a signal only when the clock sends the signal, so we can get a tempo of the execution, creating a more solid utilization for real world situations. 
 
-This scenario setup also means we can save information based on the clock, imagine the same _CK_ wire is plugged into multiple flip-flops, we can save information and be certain it will maintain the same state until the next clock.
+This scenario setup also means we can save information based on the clock. Imagine the same _CK_ wire is plugged into multiple flip-flops, we can save information and be certain it will maintain the same state until the next clock.
 
 
 ### JK - Flip Flop
@@ -94,38 +94,61 @@ So, at first the value will be $0000$, then we have the first cycle, and the fir
 0000 → 0001 → 0010 → 0011 → 0100 → 0101 → ... → 1111 → 0000
 
 The max value we can count in this 4-bit setup is 8, then it returns to zero.
+
+## Registers
+
+>This part is going to be half baked tbh. It's too much things to cover and I don't have the technicall knowledge and the didatics to abstract everything.
+
+Registers are the blocks used by the CPU or processing unit to manage data. I'm going to focus on normal CPUs to smooth the transition/pivot to the next posts. 
+
+The actual structure of the register can vary, so I will show the CPU internal registers and cache systems, starting with the architectural registers. There are multiple types/classes of internal registers.
+
+From the architectural registers, there are the General-purpose registers (GPRs), Floating-point registers (FPRs), Vector / SIMD registers (going to talk about these guys in the post about database optimization, I guess), Program counter (PC), Stack pointer (SP), Status / flag registers, Control / System registers, and Segment registers. While in the pipeline-stage registers, there are IF/ID, ID/EX, EX/MEM and MEM/WB. Depending on the processor architecture, the registers will have different sizes, like 8, 16, 32, 64, 128, 256 or 512 bits. The 32 and 64 are the most popular these days for home computers and servers, of course, because of the popularity they are more compatible with most software and applications. 
+
+These registers, except for some GPRs, the FPRs, and the Vector/SIMD registers, are all D flip-flop (for reference, the D latch we already saw but have a clock in the _E_ input) type, and this is mostly because of the reliability. The SR latch has an inconsistent state of S=R=1, and the JK has undefined behavior when changing the value while the clock is active. The D doesn't have any of this problem because the only possible output is 0 or 1 independently of the situation, as we can see in the truth table:
+
+{{< figure src="/img/memory/d_type_flip-flop.png"
+   alt="Chained T flip-flops acting as a binary ripple counter, each stage toggling at half the rate of the previous"
+   caption="Figure 7 — D flip-flops chained as a counter"
+   attr="Source: Geeks for geeks"
+   attrlink="https://www.geeksforgeeks.org/digital-logic/applications-of-flip-flop/"
+   align="center" >}}
+
+I tried to find some flip-flops at the silicon die level, but it's integrated into the chip, and I couldn't find any good images representing it. If you are interested in a deeper level, I recommend this [Wikipedia](https://en.wikipedia.org/wiki/Flip-flop_(electronics)) page about flip flops as the guide.
+
+If you are curious about the silicon die, here is one example from [Ken Shirriff's blog](https://www.righto.com/) of the Intel 8086 processor:
+
+{{< figure src="/img/memory/silicon_die_x8086.png"
+   alt="Chained T flip-flops acting as a binary ripple counter, each stage toggling at half the rate of the previous"
+   caption="Figure 8 — D flip-flops chained as a counter"
+   attr="Ken Shirriff's blog about flip flops image from intel 8086"
+   attrlink="https://www.righto.com/2023/09/8086-flip-flops.html"
+   align="center" >}}
+
+>I pretend to write about processor architectures in the future, but don't know when and I'm still missing too much technically speaking
+
+A small recap: we now know about some of the lowest possible structures used to store bits, we also know that this structure (D flip-flops) is used in the internals and in pipelines connecting processes. But what about the next level? The processor cache (L1, L2, L3, ...) and what about even farther memories? The RAM, VRAM memories, etc.?
+
+## Cache memory
+
+For bigger blocks of memory, the processor has to rely on other storage systems apart from the _registers,_ and the next ones in the queue of memory capacity are the L1, L2 and L3. You can think of these as the first, second and third levels/lines. They increase progressively in size and inversely in speed when it comes to the time it takes to get or insert some data into them.
+
+Here is one example of a multi-core architecture with the L1, L2, L3 labeled in the image.
+
+> If you are interested I recommend this [thread](https://superuser.com/questions/196143/where-exactly-l1-l2-and-l3-caches-located-in-computer) and the [blog post](https://pikuma.com/blog/understanding-computer-cache) from pikuma (source of the image below)
+
+{{< figure src="/img/memory/i5_first_gen_processor_l1_l2_l3.png"
+   alt="Chained T flip-flops acting as a binary ripple counter, each stage toggling at half the rate of the previous"
+   caption="Figure 9 — D flip-flops chained as a counter"
+   attr="Pikuma post about computer cache"
+   attrlink="https://pikuma.com/blog/understanding-computer-cache"
+   align="center" >}}
+
+Now, getting back to the theme itself, these L memories don't use the D flip-flop architecture but the SRAM.
+
+### SRAM
+
 <!--
-  1. SR latch
-  Set/Reset, the forbidden 1|1 and 0|0 states. (you have this)
-
-  2. Why a clock
-  Quick motivation: coordinating many bits, avoiding races. Sets up everything clocked.
-
-  3. Gated SR / gated D latch
-  Add an enable line; D removes the invalid state. (you have D)
-
-  ▎ Terminology fix: your current "Flip-Flop version" (clocked SR) is a gated latch — level-triggered, transparent while the clock
-  ▎ is high. Not yet a flip-flop.
-
-  4. Latch → flip-flop: edge triggering (master–slave)
-  The transparency problem and how chaining two latches makes it update only on the clock edge. This is what actually separates
-  latch from flip-flop.
-
-  5. JK
-  Repurpose SR's forbidden combo into a toggle.
-
-  6. T
-  JK with inputs tied → pure toggle → counters. Short, it's a special case.
-
-  7. Registers
-  Stack D flip-flops on a shared clock to hold a full word (your "32 of these" idea pays off here).
-
-  8. Addressing — decoders & multiplexers
-  How you select one register out of many. The bridge to addressable memory.
-
-  9. SRAM cell & array
-  6-transistor cell (a latch + access transistors), word lines / bit lines, the grid layout.
-
   10. DRAM (contrast)
   Capacitor + refresh: denser but volatile-by-leakage. SRAM vs DRAM trade-off.
 
