@@ -17,11 +17,11 @@ The difference between both is that the latch doesn't have a clock and keeps the
 
 I'm going to make this part progressive, starting from the base latch to flip-flop, D type, JK type, and finally T type.
 
-### S-R Latch
+### S - R Latch
 
 {{< figure src="/img/memory/sr-flip-flop-logic-diagram.jpg"
    alt="S-R latch built from cross-coupled gates with Set and Reset inputs"
-   caption="Figure 1 — S-R latch"
+   caption="Figure 1 - S-R latch"
    align="center" >}}
 
 Uses two inputs, Set and Reset.
@@ -34,12 +34,11 @@ Looking at a bigger picture, the circuit to store 32 bits is needed, 32 of these
 
 >If it doesn't make sense watch this [video](https://www.youtube.com/watch?v=KM0DdEaY5sY)
 
-
-### D Latch
+### D - Latch
 
 {{< figure src="/img/memory/internal-logic-d-latch.webp"
    alt="D latch internal logic: a single data input split by a NOT gate into the Set and Reset lines, gated by an enable"
-   caption="Figure 2 — D latch"
+   caption="Figure 2 - D latch"
    align="center" >}}
 
 Now instead of using two buttons to Set and Reset the state, we can centralize it in one and change the state by clicking this button with the _Define_. We added the _NOT_ logic gate there that will force the system to be oppositely synced. We still have the _CLK_ from before, but now it's called the _E_ (stands to enable) but works as usual.
@@ -50,7 +49,7 @@ With that, we remove a problem of inconsistency state because both are off or on
 
 {{< figure src="/img/memory/sr-flip-flop-logic-circuit.jpg"
    alt="Clocked SR flip-flop: SR inputs ANDed with a clock line so updates only happen on the clock"
-   caption="Figure 3 — Clocked SR flip-flop"
+   caption="Figure 3 - Clocked SR flip-flop"
    align="center" >}}
 
 The difference here is that it has 3 inputs, and there are these _AND_ logic gates that lock the update to be based on the clock. From now on, it can be updated based on time and will accept a signal only when the clock sends the signal, so we can get a tempo of the execution, creating a more solid utilization for real world situations. 
@@ -62,7 +61,7 @@ This scenario setup also means we can save information based on the clock. Imagi
 
 {{< figure src="/img/memory/J-K-flip-flop-diagram.png"
    alt="JK flip-flop with the Q and Q-bar outputs fed back into the input AND gates"
-   caption="Figure 4 — JK flip-flop"
+   caption="Figure 4 - JK flip-flop"
    align="center" >}}
 
 Consider the pulse detector as the _clock_ we already saw before. We can spot that the difference is these extra lines going from the end to the start (important to remember is that this _AND_ from the image needs all 3 inputs to activate). These lines ensure that there is no _faulty_ state like J and K equals 1 because even if that happens, the output will still be only one high.
@@ -73,7 +72,7 @@ Consider the pulse detector as the _clock_ we already saw before. We can spot th
 
 {{< figure src="/img/memory/t_flip_flop.png"
    alt="T flip-flop: a JK flip-flop with its J and K inputs tied together into a single toggle line"
-   caption="Figure 5 — T flip-flop"
+   caption="Figure 5 - T flip-flop"
    attr="Source: hackatronic.com"
    attrlink="https://www.hackatronic.com/t-flip-flop-truth-table-circuit-diagram-working-and-applications/"
    align="center" >}}
@@ -84,7 +83,7 @@ You put one after another, linking one output to the T of the next one. This way
 
 {{< figure src="/img/memory/t_flip_flop_count.png"
    alt="Chained T flip-flops acting as a binary ripple counter, each stage toggling at half the rate of the previous"
-   caption="Figure 6 — T flip-flops chained as a counter"
+   caption="Figure 6 - T flip-flops chained as a counter"
    attr="Source: ResearchGate"
    attrlink="https://www.researchgate.net/publication/220990006_Static_consistency_checking_for_Verilog_wire_interconnects_Using_dependent_types_to_check_the_sanity_of_Verilog_descriptions"
    align="center" >}}
@@ -93,7 +92,7 @@ So, at first the value will be $0000$, then we have the first cycle, and the fir
 
 0000 → 0001 → 0010 → 0011 → 0100 → 0101 → ... → 1111 → 0000
 
-The max value we can count in this 4-bit setup is 8, then it returns to zero.
+The max value we can count in this 4-bit setup is 15 (1111), giving 16 distinct states, then it returns to zero.
 
 ## Registers
 
@@ -108,9 +107,9 @@ From the architectural registers, there are the General-purpose registers (GPRs)
 These registers, except for some GPRs, the FPRs, and the Vector/SIMD registers, are all D flip-flop (for reference, the D latch we already saw but have a clock in the _E_ input) type, and this is mostly because of the reliability. The SR latch has an inconsistent state of S=R=1, and the JK has undefined behavior when changing the value while the clock is active. The D doesn't have any of this problem because the only possible output is 0 or 1 independently of the situation, as we can see in the truth table:
 
 {{< figure src="/img/memory/d_type_flip-flop.png"
-   alt="Chained T flip-flops acting as a binary ripple counter, each stage toggling at half the rate of the previous"
-   caption="Figure 7 — D flip-flops chained as a counter"
-   attr="Source: Geeks for geeks"
+   alt="D flip-flop truth table: the output Q simply follows the D input on each clock edge"
+   caption="Figure 7 - D flip-flop truth table"
+   attr="Source: GeeksforGeeks"
    attrlink="https://www.geeksforgeeks.org/digital-logic/applications-of-flip-flop/"
    align="center" >}}
 
@@ -119,9 +118,9 @@ I tried to find some flip-flops at the silicon die level, but it's integrated in
 If you are curious about the silicon die, here is one example from [Ken Shirriff's blog](https://www.righto.com/) of the Intel 8086 processor:
 
 {{< figure src="/img/memory/silicon_die_x8086.png"
-   alt="Chained T flip-flops acting as a binary ripple counter, each stage toggling at half the rate of the previous"
-   caption="Figure 8 — D flip-flops chained as a counter"
-   attr="Ken Shirriff's blog about flip flops image from intel 8086"
+   alt="Annotated silicon die of the Intel 8086 processor highlighting its flip-flops"
+   caption="Figure 8 - Flip-flops on the Intel 8086 silicon die"
+   attr="Source: Ken Shirriff's blog (Intel 8086 flip-flops)"
    attrlink="https://www.righto.com/2023/09/8086-flip-flops.html"
    align="center" >}}
 
@@ -138,9 +137,9 @@ Here is one example of a multi-core architecture with the L1, L2, L3 labeled in 
 > If you are interested I recommend this [thread](https://superuser.com/questions/196143/where-exactly-l1-l2-and-l3-caches-located-in-computer) and the [blog post](https://pikuma.com/blog/understanding-computer-cache) from pikuma (source of the image below)
 
 {{< figure src="/img/memory/i5_first_gen_processor_l1_l2_l3.png"
-   alt="Chained T flip-flops acting as a binary ripple counter, each stage toggling at half the rate of the previous"
-   caption="Figure 9 — D flip-flops chained as a counter"
-   attr="Pikuma post about computer cache"
+   alt="Multi-core CPU layout with the L1, L2 and L3 cache levels labeled"
+   caption="Figure 9 - L1/L2/L3 cache in a multi-core CPU"
+   attr="Source: Pikuma (understanding computer cache)"
    attrlink="https://pikuma.com/blog/understanding-computer-cache"
    align="center" >}}
 
