@@ -56,6 +56,8 @@ ADALINE came after the perceptron and is the same except for the evolution in tr
 
 First, ADALINE changes the error calculation format, instead of the previously described one, we are going to use what is called the mean squared error. This one can change the weights of the neuron even when it has the correct values, which creates a more optimized training system.
 
+> Revision here: The system becomes more optimized because, by fixing the weights even for correct guesses, you update them more frequently within the same number of steps.
+
 This system also outputs continuous values, which is completely different from the perceptron that gave a binary result (the threshold only comes back at the very end if you actually need a yes/no). A good example of a neuron function within ADALINE's scope is noise cancellation, which gets the frequency input and the output is the frequency that should be emitted to neutralize it. 
 
 ### Squared error and MSE
