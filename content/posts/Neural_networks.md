@@ -8,9 +8,9 @@ math: true
 >I just had a uni class about natural language processing and it lit up the need to write about it to reinforce my learning in the topic
 
 Me 2 weeks in the future here, I didn't expect this post to become this big and didn't cover everything I wanted. In the future I'll also cover CNN, RNN, Transformer, and so on. After finishing this post, I thought maybe it's not for everyone because it became a bit too technical with heavy math (I gave my best in simplifying, but I still have a lot to learn,  this is the most I've written in one shot in my life until now). So for those who came here just to peek, here are some recommendations:
-- Want some visual reference and not much math? I recommend this [youtube playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi), the 1-3 videos will explain everything from this blog post but more friendly, and the didactics are flawless.
+- Want some visual reference and not much math? I recommend this [youtube playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi), the 1-3 videos will explain everything from this blog post but in a friendlier way, and the didactics are flawless.
 - Some history is embedded in the content. My recommendation is this [page](https://com-cog-book.github.io/com-cog-book/features/roadmap-nn-mod-cog.html), which also walks similarly to mine in the math too, but it's a different pacing.
-- Generalist thing about machine learning in general i recommend this [site](https://www.byhand.ai/) from Professor Tom Yeh, he is spectacular and shows things in a way I never even imagined.
+- Generalist thing about machine learning in general I recommend this [site](https://www.byhand.ai/) from Professor Tom Yeh, he is spectacular and shows things in a way I never even imagined.
 
 I'm going to try to cover everything from zero to present. I am not sure if it will be too technical or anything like that, but I will try to make it focused on didactics. That said, let's start..
 
@@ -31,7 +31,7 @@ So in this case we have to change it little by little while testing to reach the
 ### Training and the learning rate
 
 It's kind of complicated to think about for the first time, but it makes sense. We don't care how the weights are set but only if the output is correct. So we have to provide a data source of example with the source of truth, like a datasheet with multiple lines, where each line will have 200 inputs and the desired result.
-Then create a function to change the weights individually based on the desired result so it becomes more propitious to get the correct answer.
+Then create a function to change the weights individually based on the desired result so it becomes more likely to get the correct answer.
 
 {{< figure src="/img/neural_net/learning_rates_formula.png"
    alt="Perceptron weight-update formula"
@@ -46,7 +46,7 @@ If we look from the high ground, it just applies a little change to the weight, 
 
 But this fix in weight will happen for all the input weights at the same time. This way we get closer to the desired result by a learning rate factor of η. (It's possible it overfits, which would be a neuron specialized in the dataset getting accuracy of 100% in the training runs and 30% in the actual test. But you don't have to give much thought to that for now.)
 
-So after all this mathematics and changing the weights of your perceptron, it becomes actually useful, and when you feed it new real-world data, it outputs with a good accuracy (what is good here depends on context because a probability of rain accuracy of 80% can be okay, I mean, if it misses in 20% of the cases is not the end of the world).  So now you can set up your tech house with multiple sensors and connect everything to your local PC to run and feed the Perceptron and know everything about the chances of your roommate “forgetting” to do the dishes again.
+So after all this mathematics and changing the weights of your perceptron, it becomes actually useful, and when you feed it new real-world data, it outputs with a good accuracy (what is good here depends on context because a probability of rain accuracy of 80% can be okay, I mean, if it misses 20% of the cases it's not the end of the world).  So now you can set up your tech house with multiple sensors and connect everything to your local PC to run and feed the Perceptron and know everything about the chances of your roommate “forgetting” to do the dishes again.
 
 # ADALINE
 >I was pondering going directly to multilayer perceptron and explaining backpropagation there. But it would be missing something, so I think ADALINE is a good context bridge. 
@@ -54,9 +54,9 @@ This topic will be a bit math-heavy, so take your time to understand and digest 
 
 ADALINE came after the perceptron and is the same except for the evolution in training. Just to recap, the error computation in the perceptron is the comparison between the expected output and the current output, which will be subtracted and multiplied by the learning rate and the input value. Also important to observe that it only corrects too much or nothing, which also isn't ideal for training.
 
-First, ADALINE changes the error calculation format, instead of the previously described one, we are going to use what is called the mean squared error. This one can change the weights of the neuron even when it have the correct values. Which creates a more optimized training system.
+First, ADALINE changes the error calculation format, instead of the previously described one, we are going to use what is called the mean squared error. This one can change the weights of the neuron even when it has the correct values, which creates a more optimized training system.
 
-This system also outputs continuous values, which is completely different from the perceptron that gave a binary result (the threshold only comes back at the very end if you actually need a yes/no). A good example of neuron function that is in ADALINE scope is noise cancellation, which gets the frequency input and the output is the frequency that should be emitted to neutralize. 
+This system also outputs continuous values, which is completely different from the perceptron that gave a binary result (the threshold only comes back at the very end if you actually need a yes/no). A good example of a neuron function within ADALINE's scope is noise cancellation, which gets the frequency input and the output is the frequency that should be emitted to neutralize it. 
 
 ### Squared error and MSE
 
@@ -108,13 +108,13 @@ This graph represents the influence of the weights in the inputs when compared t
 
 As said before, we are looking for the lowest point in the vertical axis that has the lowest value for the sum of error, which means the best pair of weights for every input possible or even the optimal function. The name of this lowest point is minima. 
 
-In the case of ADALINE only a unique minima is possible because it's an exclusive convex problem, but in other situations you could have multiple bases/low points. Of course only one would be the lowest, which is called the global minima but could have other local minimas that's called local minima.
+In the case of ADALINE only a unique minima is possible because it's an exclusive convex problem, but in other situations you could have multiple bases/low points. Of course only one would be the lowest, which is called the global minima, but there could be other low points called local minima.
 
 >Cool view of neural networks is that all of it is just some optimization problem in which, given some input, we want to achieve the lowest error summing rates.
 
 ### Gradient Descent algorithm
 
-This algorithm is the union of the Loss function(MSE) with some tweaks to reach the minima. I really mean just minima because it works for convex and nonconvex problems, but in the latter it is not guaranteed to reach the global minima.
+This algorithm is the union of the Loss function (MSE) with some tweaks to reach the minima. I really mean just minima because it works for convex and nonconvex problems, but in the latter it is not guaranteed to reach the global minima.
 
 So, considering this plot:
 
@@ -123,7 +123,7 @@ So, considering this plot:
    caption="Figure 5 — Non-convex error surface" 
    align="center" >}}
 
-We can think again about earlier observations, we want to reach the minima but how do we use the MSE in the learning process? We already know looking at the plot what's the direction but how we generalize this and apply in some perceptron with more than 2 inputs.
+We can think again about earlier observations, we want to reach the minima but how do we use the MSE in the learning process? We already know looking at the plot what's the direction but how do we generalize this and apply it to a perceptron with more than 2 inputs?
 
 First let me put the MSE function here again:
 
@@ -131,9 +131,9 @@ $$E(\hat{y}, y) = \frac{1}{n} \sum_{j=1}^{n} (\hat{y}_j - y_j)^2$$
 
 Think about that function, what if we could test the result of MSE if we slightly changed the weight? 
 
-If the MSE reduced means we are walking in the right direction, if not we can go make the opposite weight change, like instead of increase we decrease it.
+If the MSE reduced, it means we are walking in the right direction; if not, we make the opposite weight change, like instead of increase we decrease it.
 
-There is a mathematical way of testing a function with the smallest possible value to get the answer we need. But it's gonna return us a new function which is always point to the steepest ascent. (Derivatives) Here is the mathematical show off:
+There is a mathematical way of testing a function with the smallest possible value to get the answer we need. But it's gonna return us a new function which always points to the steepest ascent. (Derivatives) Here is the mathematical show off:
 
 Start with the squared error function because we can change it at input value level, so it can optimize the weights even more specifically:
 
@@ -143,13 +143,13 @@ Take the derivative with respect to the weight $w$ also the $x$ here comes from 
 
 $$\frac{\partial L}{\partial w} = 2(\hat{y} - y) \cdot x$$
 
-This derivative tells us the direction in which $L$ increases fastest. Since we want $L$ to decrease, we step in the opposite direction by flipping the sign, also we are gonna call this derivative as the calculated gradient:
+This derivative tells us the direction in which $L$ increases fastest. Since we want $L$ to decrease, we step in the opposite direction by flipping the sign, and we are gonna call this derivative the calculated gradient:
 
 $$w_{\text{new}} = w_{\text{old}} - \eta \, \Delta w$$
 
-So the recap is we got the error function, applied a property called derivation which tell us where the steepest ascent is and inverted it's value to run towards the lowest level which is a minima (local for ADALINE and maybe global for nonconvex optimization problems).
+So the recap is we got the error function, applied a property called derivation which tells us where the steepest ascent is and inverted its value to run towards the lowest level which is a minima (local for ADALINE and maybe global for nonconvex optimization problems).
 
-Reminder that the \(\eta \) is just the learning rate which we want. If it's too big it will start jumping around and if is too small it will take too much time to reach the optimal goal, as we can see in the image:
+Reminder that the \(\eta \) is just the learning rate which we want. If it's too big it will start jumping around and if it's too small it will take too much time to reach the optimal goal, as we can see in the image:
 
 {{< figure src="/img/neural_net/learning_rate.png" 
    alt="Effect of the learning rate: small steps converge slowly, large steps overshoot" 
@@ -188,7 +188,7 @@ So, let's dive into it. This image represents a multilayer perceptron, and as cl
 
 Not going to elaborate on the inputs and outputs because it's still the same. The hidden layer is like a block that consists of one or multiple linear and nonlinear functions on the same network. 
 
->Recap: The linear function will change the values with the weights and the nonlinear functions will treat the value to be outputed (simple example here is the threshold function that will be yes if the value is from one point). Another perspective of linear and nonlinear is the graphic, the name already says everything, one will be a line and the other not, and by non linear you can think of curve or the thresholds.
+>Recap: The linear function will change the values with the weights and the nonlinear functions will treat the value to be output (simple example here is the threshold function that will output yes if the value is above a certain point). Another perspective of linear and nonlinear is the graphic, the name already says everything, one will be a line and the other not, and by nonlinear you can think of a curve or the thresholds.
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
 <summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click to see the plot comparison</summary>
@@ -203,7 +203,7 @@ The news here is that we can put in multiple processing units, so from now on we
 
 When models are trained or tested for some generalization feature, they use some dataset as a source. With that, we can make it follow the desired behavior, but we can't forget that at the end of the day we are searching for some pattern and trying to follow it. If we go too deep, we'll become specialized in this pattern instead of this _behavior_. This phenomenon is what we call overfit. The simplest solution to prevent overfitting is to separate the dataset, usually 80/20, where 80 is the training data and 20 is the test data. Doing that, we can measure the MSE for both executions. The expected behavior is for the training error to be slightly below the test error, I mean, the training run should have a bit less error occurrence (the MSE can also be called the _Loss_ function).
 
->This gif is example of overfitting happening in polynomial regression, you can increase the polynomial level but eventually it becomes bounded to overfitting, then the _outlier_ which could be the training data will be left out. Our situation is similar, adding more neurons add granularity and accuracy but can converge in this behavior. In other words, reduce the chances of correctly predicting if your roommate will _forget_ the dishes again.
+>This gif is an example of overfitting happening in polynomial regression, you can increase the polynomial level but eventually it becomes bounded to overfitting, then the _outlier_ which could be the training data will be left out. Our situation is similar, adding more neurons add granularity and accuracy but can converge in this behavior. In other words, reduce the chances of correctly predicting if your roommate will _forget_ the dishes again.
 
 {{< figure src="/img/neural_net/overfitting.gif" 
    alt="Overfitting animation showing polynomial fits from degree 1 to 15" 
@@ -246,7 +246,7 @@ $$g(f(x)) = W x + B$$
    caption="Figure 11 - Why the activation function is needed" 
    align="center" >}}
 
-The sigma function, as represented below, is a function that creates a range that fits every value, so it doesn't matter whether it's bigger or smaller, it will squash everything between 0 and 1. Also, a good use case would be the chance of activation for example, when the value is bigger, it is “more probable” of activating. When we are talking about training, this can mean almost anything, but imagine the chance of some part of the image being straight or curved. When a group of neurons specialized in detecting curves outputs values above 0.90, together they signal that the image contains a curve.
+The sigma function, as represented below, is a function that creates a range that fits every value, so it doesn't matter whether it's bigger or smaller, it will squash everything between 0 and 1. Also, a good use case would be the chance of activation for example, when the value is bigger, it is “more probable” to activate. When we are talking about training, this can mean almost anything, but imagine the chance of some part of the image being straight or curved. When a group of neurons specialized in detecting curves outputs values above 0.90, together they signal that the image contains a curve.
 
 $$\sigma(x) = \frac{1}{1 + e^{-x}}$$
 
@@ -261,7 +261,7 @@ This is the graph plot of this function:
 
 For the sake of simplicity, I was keeping just the MSE, but right now we can have some additional thoughts on that. Considering that training is an optimization problem, the way to measure the error can return different results depending on the output. If our optimization has to prioritize normal number outputs, the MSE is great, but if we want some binary classification, it doesn't work too well because of the activation function. The derivative of the sigmoid flattens every loss calculation that's too minimal or too big. If we consider some prediction that the correct answer is 1 and it outputted 0.01, the error is massive but will be invisible after the derivative of the sigmoid. The same happens if the error is minimal or the value is probably correct. The change in the actual optimization is negligible. The plot below shows the effects side by side.
 
->Recap: Derivatives points to the steepest ascent. The derivative of the sigmoid correction will only make a difference if the value is _existent_.
+>Recap: Derivatives point to the steepest ascent. The derivative of the sigmoid correction will only make a difference if the value is _existent_.
 
 {{< figure src="/img/neural_net/derivative_sigmoid.png" 
    alt="Sigmoid and its derivative plotted side by side, the derivative peaking near zero and flattening at the tails" 
@@ -278,7 +278,7 @@ This loss function, contrary to the MSE, performs well in binary classifications
 
 >Recap: the $\hat{Y}_i$ is the predicted value and the $Y_i$ is the true label/correct value from the training dataset.
 
-> We will always use the negative log because numbers will always range 0 and 1 and this range always returns negative log but still super convenient for quantitative measuring in our case.
+> We will always use the negative log because numbers will always range from 0 to 1, and this range always returns a negative log, but it's still super convenient for quantitative measurement in our case.
 
 >Math reminder $log(1) = 0$ and $log(0) = -\infty$
 
@@ -295,7 +295,7 @@ $$ - (Y_i \cdot \log \hat{Y}_i)$$
 
 This one I'll call the positive part. Here we calculate how well the network predicted the positive class when the answer really was close to 1, because if the correct value is 1, it will multiply the log calculated by one. Therefore, consider 100% of the $\log \hat{Y}_i$, so it attaches something like a weight for how much this error measure is important for positive values.
 
-While in the other part (the negative one), it calculated how well the network predicted the negative class when the answer was close to 0. We multiply the log of $1 - \hat{Y}_i$ (one minus the predicted value) times $1 - Y_i$ because it will multiply 100% of the log only if the $Y_i$ (expected value) is 0, otherwise, it will remove the importance of the calculated log of $1 - \hat{Y}_i$.
+While in the other part (the negative one), it calculates how well the network predicted the negative class when the answer was close to 0. We multiply the log of $1 - \hat{Y}_i$ (one minus the predicted value) times $1 - Y_i$ because it will multiply 100% of the log only if the $Y_i$ (expected value) is 0, otherwise, it will remove the importance of the calculated log of $1 - \hat{Y}_i$.
 
 $$- ((1 - Y_i) \cdot \log(1 - \hat{Y}_i))$$
 
@@ -357,13 +357,13 @@ Let's start visualizing a multilayer example (one neuron per layer):
    caption="Figure 15 - Multilayer (one neuron per layer) visualization" 
    align="center" >}}
 
-Here we can find a neuron with 2 hidden layers, both with an activation function and the output also with an activation function. There are 3 weights in the diagram and arrows pointing where each one fits in the value at point L function.
+Here we can find a neuron with 2 hidden layers, both with an activation function and the output also with an activation function. There are 3 weights in the diagram and arrows pointing to where each one fits in the value at the point-L function.
 
 The variable $z^{(L)}$ is the value being passed after weight and bias calculation at point L when submitted to the function $f(z^{(L)})$ is $a^{(L)}$.
 
 This $f()$ function is just a placeholder for any function, usually activation functions $\phi$, but can be used as identity functions (which do nothing so it only compacts the weights from both sides as we talked before) too in case of MSE regressions.
 
-With these functions and the draw in mind:
+With these functions and the drawing in mind:
 
 $$z^{(L)} = w^{(L)} a^{(L-1)} + b^{(L)}$$
 
@@ -379,7 +379,7 @@ And this is the feedforward where the values pass once and then proceed to train
 
 >Recap: everything we're about to do is just the _chain rule_ from calculus. When a value passes through a stack of functions, the derivative of the whole thing is the product of the derivative of each step. Backpropagation is literally that rule applied layer by layer, walking from the output back to the input.
 
-> We are not gonna use activation function so I'm obfuscating the $a$ for the $z$ directly, so consider the $z^{(L)} = w^{(L)} z^{(L-1)} + b^{(L)}$
+> We are not gonna use an activation function so I'm obfuscating the $a$ for the $z$ directly, so consider the $z^{(L)} = w^{(L)} z^{(L-1)} + b^{(L)}$
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
 <summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to see the math without hiding the $a$</summary>
@@ -505,7 +505,7 @@ Yes, the weight looks weird, like inverted, but that's how it is. We can read as
    caption="Figure 17 - Multi-unit Multineuron visualization" 
    align="center" >}}
 
-This is the draw we are going to use as an example to move forward.
+This is the drawing we are going to use as an example to move forward.
 
 I'll reintroduce the $z$ formula but now consider multiple neurons on the same floor and the activation function:
 
@@ -557,7 +557,7 @@ $$w_{12}^{(L)} = w_{12}^{(L)} - \eta \cdot \nabla_1^{(L)} \cdot a_2^{(L-1)}$$
 
 </details>
 
->Important to say that each weight is independent so the updates have to pass by all of them one by one, of course the gradient descent itself are just two calculation, for $\nabla_0$ and $\nabla_1$. I know it looks inefficient but for the sake of didactics it's worth. After this topic I'm gonna introduce how it is actually done in computation and real world because this way would be too slow.
+>Important to say that each weight is independent so the updates have to pass by all of them one by one, of course the gradient descent itself is just two calculations, for $\nabla_0$ and $\nabla_1$. I know it looks inefficient but for the sake of didactics it's worth it. After this topic I'm gonna introduce how it is actually done in computation and real world because this way would be too slow.
 
 For the $L-1$ layer, we are going to sum the gradients from the output and multiply by the activation function of the neuron being calculated:
 
