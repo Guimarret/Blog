@@ -9,6 +9,14 @@ So, this is an extensive and sometimes boring matter but also essential.
 
 I'm going to start with latches and flip-flops and hopefully end in RAM/SRAM.
 
+Recommendations for those who came to peek:
+
+- [Memory circuits pdf](https://cc.ee.ntu.edu.tw/~lhlu/eecourses/Electronics3/Electronics_Ch17.pdf)
+- [SRAM memories](https://thefragmentationparadox.blogspot.com/2014/12/sram-memories.html) most technical high quality content i readed
+- [SRAM architecture lecture](https://youtu.be/kypPuQpAQJc?si=g0jk-CLbLHoHrvfT)
+- [Ben eater](https://www.youtube.com/@BenEater) is the recommendation for anything related to eletronics and flip-flops
+- [Sense amplifiers](https://www.youtube.com/watch?v=MXnZiiuHXIo&lc=UgxlTip-2RsqoBp_75p4AaABAg) intuition drawing
+
 # Latch/Flip-flops
 
 For a fresh start and just for contextualization, latches and flip-flops are bi-stable memory elements. That means they can hold binary information depending on the state.
@@ -147,7 +155,7 @@ Now, getting back to the theme itself, these L memories don't use the D flip-flo
 
 ## SRAM
 
-Stands for static random-access memory (SRAM), this memory main purpose is to be compact and fast while maintaining realiability. We are going to use as base the 6T SRAM cell architecture, because this is the most common one. There is also the 4T (T stands for transistor here), even being smaller this one suffers from stability and data leakage. (I'm still not that proficient in eletrics to explain the leakage but it's associated with the resistor load being enoughly high to minimze the current or something, also this point is 100% open to revision and I pretend to write more about when I feel ready).
+Stands for static random-access memory (SRAM), this memory's main purpose is to be compact and fast while maintaining reliability. We are going to use as a base the 6T SRAM cell architecture because this is the most common one. There is also the 4T (T stands for transistor here), even being smaller, this one suffers from stability and data leakage. (I'm still not that proficient in electronics to explain the leakage, but it's associated with the resistor load being high enough to minimize the current or something, also this point is 100% open to revision, and I pretend to write more about it when I feel ready).
 
 >The S in SRAM differ from D in DRAM from next topic in the meaning of static and dynamic. Static stands for the state of the bit saved, it's going to be the same forever as long as there is current, while the dynamic have to be _rehydrated_ with otherwise it looses the saved data, deeper approach in later in the text.
 
@@ -164,7 +172,7 @@ Here is the simplified diagram of the 6T SRAM (6 transistors Static Random Acces
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
 <summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click to see the real cell design</summary>
 
-They are the same but this one show all the transistors instead of the high level vision:
+They are the same, but this one shows all the transistors instead of the high level vision:
 
 {{< figure src="/img/memory/Standard-6T-SRAM-Cell.png"
    alt="Standard 6T SRAM cell: two cross-coupled inverters back to back, with two access pass transistors gated by the word line (WL) connecting the cell to the bit lines (BL and BLB)."
@@ -174,7 +182,7 @@ They are the same but this one show all the transistors instead of the high leve
    align="center" >}}
 </details>
 
-Starting with these dual NOT logic gate, this gate change the input so if 1 entered the other side will be 0:
+Starting with these dual NOT logic gates, this gate changes the input so if 1 is entered, the other side will be 0:
 
 {{< figure src="/img/memory/dual_not_logic_gate.png"
    alt="Two NOT gates back to back: a 1 entering one side forces a 0 on the other"
@@ -183,33 +191,83 @@ Starting with these dual NOT logic gate, this gate change the input so if 1 ente
 
 >As simple as it get, it will just inverse the signal.
 
-Here there is two transistors that just link the output of the dual gate inside with the outsite. So, if the wordline is one, this gate will be open, otherwise it'll not. (The transistor can be used as a gate and amplifier, this case will be used as the gate connection, and the gate controller is this worldline).
+Here there are two transistors that just link the output of the dual gate inside with the outside. So, if the wordline is one, this gate will be open, otherwise it'll not. (The transistor can be used as a gate and amplifier, this case will be used as the gate connection, and the gate controller is this worldline).
 
 {{< figure src="/img/memory/connector_transistor.png"
    alt="Two access transistors linking the cell's internal nodes to the outside bit lines, opened or closed by the wordline"
    caption="Figure 13 - Access transistors gated by the wordline"
    align="center" >}}
 
-You can think of this worldline as a row selector, used by higher level systems to decide which transistor will be used. Because the worldline is the connection to the data wire $BL$ and $\bar{BL}$ and without that we can't access the data inside the circuit from any outside system. Don't forget that each SRAM structure will represent one bit so we have to get a way to manage it to make different sizes of data for example 1 byte which have to group 8 of these in sequence. We can also use the worldline number for addressing, because these structures will be groupped so we have to use something to address the exact place each bit is located.
+You can think of this worldline as a row selector, used by higher level systems to decide which transistor will be used. Because the worldline is the connection to the data wire $BL$ and $\bar{BL}$, and without that we can't access the data inside the circuit from any outside system. Don't forget that each SRAM structure will represent one bit, so we have to get a way to manage it to make different sizes of data, for example, 1 byte, which has to group 8 of these in sequence. We can also use the worldline number for addressing because these structures will be grouped, so we have to use something to address the exact place each bit is located.
 
-And now for the $BL$ and the $\bar{BL}$ from the simplified draw. It stands for Bitline, the reason one have the bar is just to differ and later on we are going to use it to find if a value is 1 or 0 based on the current on them. 
+And now for the $BL$ and the $\bar{BL}$ from the simplified draw. It stands for Bitline, the reason one has the bar is just to differ, and later on we are going to use it to find if a value is 1 or 0 based on the current on them. 
 
 ### Read
 
-Here is how we interpret the data coming from $BL$ and the $\bar{BL}$. Important to say that when we talk about data signal 0 or 1 it is actually:
-- 0: Close to 0V or GND/Vss which stands to "Voltage Source Supply"(this one exist mostly on MOS/CMOS and FETs which is our case).
-- 1: Equal to 1V or positive in general can be called Vdd which stands to "Voltage drain drain".
+Here is how we interpret the data coming from $BL$ and the $\bar{BL}$. Important to say that when we talk about data signal 0 or 1, it is actually:
+- 0: Close to 0V or GND/Vss, which stands for “Voltage Source Supply” (this one exists mostly on MOS/CMOS and FETs, which is our case).
+- 1: Equal to 1V or positive in general can be called Vdd, which stands for “Voltage drain drain”.
 
-To read the data from $BL$ and $\bar{BL}$ we compare the voltage from the first one with the second, so:
+To read the data from $BL$ and $\bar{BL}$, we compare the voltage from the first one with the second, so:
 
 - $BL > \bar{BL} = 1$
 - $BL < \bar{BL} = 0$
 
 >To the read happen we have to get the wordline active, otherwise the data catched is from other memory cell.
 
-This comparison is done using a Differential sense amplifier
+This comparison is done using a differential sense amplifier, the general idea for sense amplifiers is REALLY well explained in [this video](https://www.youtube.com/watch?v=kypPuQpAQJc). Not going to lie, I spent quite a bit of time to understand this whole SRAM composition, and to be honest, mostly because of the electrical part, which I understood nothing about at the start.
+
+The sense amplifier's goal is to amplify, of course, but why? Because there is noise in the signal, and when we talk about extremely small transistors, the capacity of grounding the voltage or increasing is smaller than in denser transistors. So we do the trick of amplifying the signal to compare afterward. This way we get a better output, not perfect, but it doesn't matter, mostly because comparing 0.99 to 0.5 is much better than 0.8 to 0.64, for example, when the difference is minimal, the chance of missing because of noise is big. Fixing the difference problem, we can get a clean digital output with minimal trickery afterward and actually use the data from the bits. In the image below, we can see the moment things happen:
+
+{{< figure src="/img/memory/sense_amplier_video_electron_tube_take.png"
+   alt="Differential sense amplifier in action: the small voltage gap between BL and BL-bar being driven apart into a clean digital level"
+   caption="Figure 14 - Differential sense amplifier amplifying the bitline difference"
+   attr="Source: YouTube (sense amplifier explanation)"
+   attrlink="https://www.youtube.com/watch?v=kypPuQpAQJc"
+   align="center" >}}
+
+The precharge is a prerequisite to read and write, you can consider that to be the current being set to the average state like 0.5V, so the distance to the 0V or to the 1V is smaller. It's not exactly that, but this is ok for the intuition. Then we connect the wordline, and the data is passed onwards to the sense amplifier, which we can see that amplifies the voltage exponentially, and then the data is passed to the next stages of the pipeline.
 
 
-<!-- CMOS inverter -->
+### Write
 
-<!-- Differential sense amplifier -->
+Writing into the SRAM (6T) is simple, we just have to activate the wordline and pass the data to the bitline and bitline bar. The inside system with two NOT gates and the Vss (ground or 0V) and Vdd (voltage drain or 1V for us) will do the job of _normalizing_ the current inside, also the SRAM works as a sense amplifier.
+
+>When I say 1V or 0V is mostly a simplification but for didatics it works (in real world it can be other values or approximation, a reason to the sense amplifier exist if you think about). 
+
+After the bitlines pass the inverted voltage and the wordline disconnects, we get the data stored in the system.
+
+### SRAM System
+
+This is a schema of a 48-bit (the less ugly and visually friendly architecture I could find, tbh) SRAM group. I will not explain the drivers, decoders, and deeper on sense amplifiers today, but it's good to know things exist as a whole.
+
+{{< figure src="/img/memory/static_ram_group.png"
+   alt="Schematic of a 48-bit SRAM array with its address decoder, drivers, and sense amplifiers around the cell grid"
+   caption="Figure 15 - 48-bit SRAM array (decoder, drivers, sense amplifiers)"
+   attr="Source: aeapr.com.br"
+   attrlink="https://www.aeapr.com.br/?a=44263698071270"
+   align="center" >}}
+
+A more realistic and complete draw would be this one, but with 32-bit 6x4:
+
+{{< figure src="/img/memory/32_bit_sram.png"
+   alt="More detailed 32-bit SRAM array arranged as a 6x4 grid of cells with its surrounding logic"
+   caption="Figure 16 - 32-bit SRAM array (6x4)"
+   attr="Source: The Fragmentation Paradox (SRAM memories)"
+   attrlink="https://thefragmentationparadox.blogspot.com/2014/12/sram-memories.html"
+   align="center" >}}
+
+ I think the intuition and the perception of the SRAM architecture and functionality are well developed, so let's move to the DRAM or the memory system for the RAM memory from the pc.
+
+## DRAM
+
+For the DRAM, let's remember what it stands for: Dynamic Random Access Memory. The difference here is that we have to keep charging the system, otherwise, it “forgets” what the value of the bit is.
+
+So, for the start, let's see what a capacitor is while looking for this representation:
+
+{{< figure src="/img/memory/schematic_diagram_capacitor.png"
+   alt="Schematic diagram of a parallel-plate capacitor: two conductive plates separated by a dielectric, storing charge across the gap"
+   caption="Figure 17 - Parallel-plate capacitor"
+   attr="Source: ResearchGate (parallel-plate capacitor schematic)"
+   attrlink="https://www.researchgate.net/figure/A-schematic-diagram-of-a-the-design-of-a-parallel-plate-capacitor-adapted-from_fig2_334446617"
+   align="center" >}}
