@@ -271,3 +271,104 @@ So, for the start, let's see what a capacitor is while looking for this represen
    attr="Source: ResearchGate (parallel-plate capacitor schematic)"
    attrlink="https://www.researchgate.net/figure/A-schematic-diagram-of-a-the-design-of-a-parallel-plate-capacitor-adapted-from_fig2_334446617"
    align="center" >}}
+
+The purpose of the capacitor is to store energy. The design is as simples as it can be, the capacitor have two conductive plates on the sides and the dieletric in the middle. The two conductive plates have opposite charge and the dieletric will evict the energy to be passed from one to another, so the energy _sits_ there. Important to say that it doesnt stays there forever, it leaks progressively. The dieletric is not perfect, it have some tiny conductivity and the transistor that blocks the current access also have some leakage. With enough time is normal to the current to change from the original value.
+
+Now we know the capacitor functionality and limitations. This is the design for the DRAM:
+
+{{< figure src="/img/memory/dram_design.png"
+   alt="DRAM cell: a single capacitor storing the bit, connected through one access transistor to the bitline and gated by the wordline"
+   caption="Figure 18 - DRAM cell (1T1C)"
+   attr="Source: mean9park (DRAM Operation)"
+   attrlink="https://mean9park.github.io/DRAM_Operation/"
+   align="center" >}}
+
+We have the capacitor storing the value and one transistor connecting the bitline that's activated based on the wordline. And that's it, the functionality of the writing and reading is similar to the SRAM storage system when it comes to wordline and bitline but here there is only one bitline instead of two. Now instead of 6T or 6 transistors we just need one capacitor and one transistor to store a bit, the size of the system for each bit is much smaller and with that we can put a lot more DRAMs in a smaller space which will call a denser memory system.
+
+But it's not all flowers, as I said before the capacitor leaks and this change from the default features from the SRAM memory. The DRAM will have to be _Dynamically_ refreshed (Name mentioned! _Dynamic Random Access Memory_), so let's see how it works.
+
+### Refreshing
+
+We can think of the refresh as a _READ_ and _WRITE_ operation that have to run once a while to keep the data "reliable". I said reliable because it's not that concrete, we are working with diffent current in a analog signal and transforming to a digital output. So, for the analog signal we have the current in the wordline as Vdd/2 or 0.5V for didatics as I said before, the Vdd or 1V will be the 1 and the GND or 0v will be the 0. 
+
+Taking that into consideration, the leak will happen to the point the sense amplifier will not recognize if it's one or another. You can say that the GND/0 will kept 0 so it will always know, right? No, because the 0V is also being leaked because of the capacitor and the transistor connecting the wordline leaks, so it keep going from GND to Vdd/2 from wordline. Knowing it leaks from the both sides, we have to refresh the data in a safe interval to guarantee the realiability of the data and this one is 64ms according to the standard set by the industry, not gonna dive in this point but this value is a sweet spot considering the temperature (leakage roughly doubles each 10°C), capacitor's insulator (measure for the evicting of energy throughput), transistor leakage and some other factors.
+
+Important to say that the write operation will only happen at row level so the refresh can't be done at a all cell simultaneously. In reality the refresh is happening basically everytime because it keep going from row to row and every 64ms it refresh all the rows in the _Bank_ (group of dram cell).
+
+The first state is the dram cell charge degradation in row 3 that was originally 1V, 0V and 1V respectivelly:
+
+{{< figure src="/img/memory/dram_1.png"
+   alt="DRAM refresh step 1: the charges stored in row 3 (originally 1V, 0V, 1V) have leaked and drifted away from their original levels"
+   caption="Figure 19 - Refresh step 1: charge degradation"
+   align="center" >}}
+
+The second state is the Bitline charging to Vdd/2 or 0.5V in the example:
+
+{{< figure src="/img/memory/dram_2.png"
+   alt="DRAM refresh step 2: the bitline is precharged to Vdd/2 (0.5V) before the cell is connected"
+   caption="Figure 20 - Refresh step 2: bitline precharged to Vdd/2"
+   align="center" >}}
+
+The third state the wordline is activated and the bitline starts to equalize the current towards the charge inside the DRAM cell.
+
+{{< figure src="/img/memory/dram_3.png"
+   alt="DRAM refresh step 3: the wordline is activated and the bitline starts to equalize toward the charge stored in the cell"
+   caption="Figure 21 - Refresh step 3: charge sharing"
+   align="center" >}}
+
+Technically the last state would be the last because the Sense Amplifier is connected directly in the bitline but for simplification reasons here is the final one. The sense amplifier will identify the change in the bitline and amplify the current towards the identified charge, it works similar to the SRAM but now we have only one line.
+
+{{< figure src="/img/memory/dram_4.png"
+   alt="DRAM refresh step 4: the sense amplifier detects the small shift on the bitline and drives it to the full level, restoring the cell's original value"
+   caption="Figure 22 - Refresh step 4: sense amplifier restores the value"
+   align="center" >}}
+
+### Architecture
+
+I think the refreshing topic also explained about the read and the writing (refresh does both if you think a bit about). Here I'm gonna be direct to the point because the post is getting too long, again... 
+
+The architecture of the DRAM blocks of memory is divided in _Channel > DIMM > Rank > Chip > Bank > Row/column > DRAM cell_:
+
+- Channel — The bus between CPU and memory.
+- DIMM — The physical stick you plug into a slot.
+- Rank — A group of chips on a DIMM that fire together to deliver one full data word.
+- Chip — A single DRAM IC, only provides part of the data word (x4, x8, or x16 bits wide).
+- Bank — An independent sub-array inside a chip, banks work in parallel.
+- Row — A line of cells inside a bank that gets "opened" as a unit.
+- Column — Within an open row, picks which bits to actually read or write.
+- Cell — One transistor + one capacitor. Stores a single bit.
+
+{{< figure src="/img/memory/chip_bank_hierarchy.png"
+   alt="DRAM organization hierarchy: a chip divided into independent banks, each bank a grid of rows and columns of cells"
+   caption="Figure 23 - DRAM chip and bank hierarchy"
+   attr="Source: mean9park (DRAM Operation)"
+   attrlink="https://mean9park.github.io/DRAM_Operation/"
+   align="center" >}}
+
+For those interested in DRAM the most complete post I readed about DRAM was [this](https://newsletter.semianalysis.com/p/the-memory-wall).
+
+As I said before I'm not gonna dive deeper than this today, because it would go too far from the focus that's memory itself.
+
+## Other types
+
+> This one is mostly for curiosity and to to call a spade a spade, I really pretend to write more about these topics in the near future by the way, but they are usually too dense and I'm a bit lazy...
+
+With the basics of the DRAM cell archtecture we could move to some newer systems. Since the 2000's the industry use the DDR, yes the one from DDR1, DDR2, DDR3, DDR4 and the DDR5. Which stands for double data rate, every cycle from the clock (the _clk_ we talked about) it makes two transfers. 
+
+### VRAM
+
+There is the memory used internally in graphic cards (GPU) which people usually calls VRAM. This one can mean GDDR which is the previous DDR but specialized in graphics (usually means more parallelism and vectorization) but some high-end GPU these days mainly because of AI accelerator uses HBM, which stands to high bandwitch memory. The main difference in these besides the paralelization is that the memory is accessed sequentially instead of randomically (gonna talk more about that in a next moment too) and have more capacity of processing via throughput and raw capacity, these type of memory can be find in:
+
+| Memory | Bandwidth | Typical capacity | Where you find it |
+|---|---|---|---|
+| **DDR5-6400** (CPU) | ~50 GB/s per channel | 32-128 GB | Desktops, laptops, servers |
+| **LPDDR5X** (mobile) | ~70 GB/s per channel | 8-32 GB | Phones, ultrabooks |
+| **GDDR6** | ~500-700 GB/s | 8-24 GB | Gaming GPUs |
+| **GDDR6X** | ~1 TB/s | 8-24 GB | RTX 4080/4090 |
+| **GDDR7** | ~1.5 TB/s | 12-32 GB | RTX 50-series |
+| **HBM3** | ~3 TB/s | 80-141 GB | H100, MI300 |
+| **HBM3E** | ~5 TB/s | 141-192 GB | B200, MI325X |
+
+### TPU
+
+Them there is the TPU which uses all of them, but the focus is in matrix multiplication basically aiming for AI in training, optimizing and developing models which under the hood is all matrix operations. This one I mentioned mostly to set in stone that I'm gonna write one post in the future completely focused on. Will be after the neural networks part 2 and the transformers, RAG, dense retrieval I guess, but it will happen.
