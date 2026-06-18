@@ -1,7 +1,7 @@
 ---
 title: "Memory"
-date: 2026-06-07T17:24:42-03:00
-draft: True
+date: 2026-06-17T17:24:42-03:00
+draft: False
 math: true
 ---
 
