@@ -9,14 +9,6 @@ So, this is an extensive and sometimes boring matter but also essential.
 
 I'm going to start with latches and flip-flops and hopefully end in the RAM/DRAM and the newer memory systems.
 
-Recommendations for those who came to peek:
-
-- [Memory circuits pdf](https://cc.ee.ntu.edu.tw/~lhlu/eecourses/Electronics3/Electronics_Ch17.pdf)
-- [SRAM memories](https://thefragmentationparadox.blogspot.com/2014/12/sram-memories.html), the most technical, high-quality content I've read
-- [SRAM architecture lecture](https://youtu.be/kypPuQpAQJc?si=g0jk-CLbLHoHrvfT)
-- [Ben eater](https://www.youtube.com/@BenEater) is the recommendation for anything related to electronics and flip-flops
-- [Sense amplifiers](https://www.youtube.com/watch?v=MXnZiiuHXIo&lc=UgxlTip-2RsqoBp_75p4AaABAg) intuition drawing
-
 # Latch/Flip-flops
 
 For a fresh start and just for contextualization, latches and flip-flops are bi-stable memory elements. That means they can hold binary information depending on the state.
@@ -372,3 +364,22 @@ There is the memory used internally in graphics cards (GPU) which people usually
 ### TPU
 
 Then there is the TPU which uses all of them, but the focus is on matrix multiplication, basically aiming for AI in training, optimizing and developing models, which under the hood is all matrix operations. I mentioned this one mostly to set in stone that I'm gonna write a post in the future completely focused on it. It will be after the neural networks part 2 and the transformers, RAG, dense retrieval I guess, but it will happen.
+
+# References
+
+Recommendations for those who came to peek:
+
+- [Memory circuits pdf](https://cc.ee.ntu.edu.tw/~lhlu/eecourses/Electronics3/Electronics_Ch17.pdf)
+- [SRAM memories](https://thefragmentationparadox.blogspot.com/2014/12/sram-memories.html), the most technical, high-quality content I've read
+- [SRAM architecture lecture](https://youtu.be/kypPuQpAQJc?si=g0jk-CLbLHoHrvfT)
+- [Ben eater](https://www.youtube.com/@BenEater) is the recommendation for anything related to electronics and flip-flops
+- [Sense amplifiers](https://www.youtube.com/watch?v=MXnZiiuHXIo&lc=UgxlTip-2RsqoBp_75p4AaABAg) intuition drawing
+
+Other articles, blog posts and references mentioned along the way:
+
+- [SR latch explanation (video)](https://www.youtube.com/watch?v=KM0DdEaY5sY)
+- [Flip-flop (Wikipedia)](https://en.wikipedia.org/wiki/Flip-flop_(electronics))
+- [Ken Shirriff's blog, Intel 8086 flip-flops](https://www.righto.com/2023/09/8086-flip-flops.html)
+- [Where L1/L2/L3 caches are located (superuser thread)](https://superuser.com/questions/196143/where-exactly-l1-l2-and-l3-caches-located-in-computer)
+- [Understanding computer cache (pikuma)](https://pikuma.com/blog/understanding-computer-cache)
+- [The memory wall (SemiAnalysis)](https://newsletter.semianalysis.com/p/the-memory-wall)
