@@ -582,10 +582,3 @@ And just like in the single-neuron case, the bias gradient for each inner-layer 
 $$\frac{\partial \mathcal{L}}{\partial b_j^{(\ell)}} = \nabla_j^{(\ell)}$$
 
 And that's it, you can just continue applying the weight changing for each layer progressively, and the model will continue learning.
-
-<!-- ## CNN -->
-
-<!-- RNN | LSTM-->
-
-<!-- Training at scale (Adam, AdamW) -->
-<!-- ![Neural Networks](/img/neural_net/neural_networks.png) -->
