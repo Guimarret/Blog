@@ -28,11 +28,17 @@ I also want to point out that reading the theoretical part of this section is re
 
 In *Tiger* the parser is made using LR (It’s important to say here that the book goes deeper into this topic, providing detailed information about LL, LR, SLR, LALR, GLR, and the implications of each one) in the end there is this representation:
 
-![](/img/compilers/formal_grammar_correct.svg)
+{{< figure src="/img/compilers/formal_grammar_correct.svg"
+   alt="Formal grammar representation produced by the LR parser"
+   caption="Figure 1 - LR parser formal grammar representation"
+   align="center" >}}
 
 After the LR parsing, the ASTs is separated from the syntactic structure, which also enables multiple passes for optimization as shown in the image with subexpression elimination:
 
-![](/img/compilers/LR_parsing_optmization.svg)
+{{< figure src="/img/compilers/LR_parsing_optmization.svg"
+   alt="AST separated from the syntactic structure after LR parsing, enabling subexpression elimination"
+   caption="Figure 2 - AST after LR parsing with subexpression elimination"
+   align="center" >}}
 
 
 The *CI* part.1 does the parsing using recursive descent and directly integrates to the AST (directly from the functions), the main point of this implementation is the error recovery via sync token consumption (That works sort of like a “panic mode”, in which the program begins to discard tokens until the *statement terminator. The advantage it provides is that it avoids cascaded errors and continues parsing to help identify more errors).
