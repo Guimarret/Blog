@@ -50,7 +50,7 @@ You can also think that for each activation neuron there will be one row of weig
 
 It's easier to process more data in one batch this way because the data is _collapsed_ in matrices.
 
-## Training techniques
+## Basic training techniques (Batch, Small-batch and SGD)
 
 Considering the matrices calculations let's jump to training techniques. By techniques I mean ways of processing the data, for example you can update the gradient descent in the training considering one dataset input, multiple inputs or even the whole dataset for every step. Abstractively you can think of it by running towards the _minima_ based on each input, on the batch or the dataset as a whole.
 
@@ -63,7 +63,7 @@ This plot is a convex surface and the lines are proceeding towards the minima:
    caption="Figure 2 - Multi-unit Multineuron visualization" 
    align="center" >}}
 
->The SGD in the substitle is white... I saw too late, sorry.
+>The SGD in the substitle is white... I saw too late, sorry. Also the gradience goes from lowest to highest as blue to orange
 
 We can see the difference in rote but they end up at least close to each other in the end. The end here stands for the decreased error surface point.
 
@@ -74,6 +74,18 @@ This next plot is the comparison between the error calculation and the number of
    caption="Figure 2 - Multi-unit Multineuron visualization" 
    align="center" >}}
 
+But even memory parallelization gets a ceiling. I plotted the relation of the total processing time with the MSE reduction and it gets clear that the curve which reachs the MSE minimal line faster in the mini-batch.
+
+{{< figure src="/img/neural_net_2/mini_batch_cumulative_wall_clock.png" 
+   alt="Multineuron multiunit" 
+   caption="Figure 2 - Multi-unit Multineuron visualization" 
+   align="center" >}}
+
+With that in mind we can reach the next step which is applying that into the first industry worldwide usable tool aka CNN for recognizing handwriting
+
+## CNN - Convolutional Neural Networks
+
+The first industry product with real evaluation using neural networks was number and letter handwriting recognition, in the US it was used to help the mail service to automatize zip codes and also sort hadwritten digits on paper for the financial sector. Earlier the problem for image processing were the size and absence of spatial context like information because everything gets flattened.
 
 
 
