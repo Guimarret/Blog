@@ -83,13 +83,73 @@ But even memory parallelization gets a ceiling. I plotted the relation of the to
 
 With that in mind we can reach the next step which is applying that into the first industry worldwide usable tool aka CNN for recognizing handwriting
 
-## CNN - Convolutional Neural Networks
+# Convolutional Neural Networks (CNN)
 
-The first industry product with real evaluation using neural networks was number and letter handwriting recognition, in the US it was used to help the mail service to automatize zip codes and also sort hadwritten digits on paper for the financial sector. Earlier the problem for image processing were the size and absence of spatial context like information because everything gets flattened.
+The first industry product with real evaluation using neural networks was number and letter handwriting recognition, in the US it was used to help the mail service to automatize zip codes and also sort hadwritten digits on paper for the financial sector. Earlier the problem for image processing were the size and absence of spatial context like information because everything gets flattened. 
+
+The intuition for this one is more direct, if you want to evaluate something you have to get the data somewhere. Naturally you will select the training data to make the output more reliable BUT if you just select anything as training the output will also be anything.
+
+That said, we want to find a way to train the model to recognize things from image. To do that, Yann Lecun in 1989 published this solution [link](http://yann.lecun.com/exdb/publis/pdf/lecun-89e.pdf) which basically *IS* the CNN until 2010 (the year alex net was released and things got another route and also exploded to other areas, but we are going to talk about that later). In the article they introduce their setup.
+
+{{< figure src="/img/neural_net_2/cnn_initial_structure.png" 
+   alt="CNN scheme" 
+   caption="Figure 2 - Multi-unit Multineuron visualization" 
+   align="center" >}}
+
+## Image, Kernels and Convolution
+
+First things first "what is a convolution". It is a mathematical operation between two function that produces a third one that represents how de second function influences the first one.
+
+Using the example from 3Blue1Brown from the [convolution video](https://www.youtube.com/watch?v=KuXjwB4LzSA), if have any curiosity in convolutions, want to dive deeper or have more intuition about what it represents in reality I recommend the video before the rest of this post.
+
+{{< figure src="/img/neural_net_2/convolution_3blue1brown.png" 
+   alt="CNN scheme" 
+   caption="Figure 2 - Multi-unit Multineuron visualization" 
+   align="center" >}}
+
+You can imagine that the output image of the kirby represent some spectre of the original image, like part of the original one but showing biased type of information. That's part of the purpose, in images to explicity some data we use this kernel, for example you can blur the image to reduce the details of the image, the edge detection in kirby which also have two collors focus based on the side which can be easily percepted that stands out in the output.
+
+>The function in the middle that apply the changes is called kernel, this kernel can be seen as a matrix weight from the last post, following the first post idea (we'll also need to train the weights to be more efficient in some patterns later on). 
+
+But for now let's think about it in the same way of the perceptron you could set manually some weight setup to distinguish some pattern that will output if your needs are attended or not. With that in mind look to the image context, you could want to find one circle + one diagonal line and say it's a six, but could be a rotated nine, allucinate some other number or even have more than one number in the same image mistakingly. We want to find a reliable way to find patterns in the whole image without any position, horizontality or verticality restriction. 
+
+{{< figure src="/img/neural_net_2/kernel_comparison.png" 
+   alt="CNN scheme" 
+   caption="Figure 2 - Multi-unit Multineuron visualization" 
+   align="center" >}}
+
+To make that using the Lecun technique from the paper we use run the kernel phase to make features stand out (lines, corners, shades, excess of definition and any possible thing that helps imply what is happening the block), then run another kernel phase again to stand even more and them compact all unit into a small number of unit new layer of 30 units and then do it again into the last layer with 10 units wich represents the digits from 0-9.
+
+Diving deeper in technical details now, observe that applying the kernel in the images will reduce in half their size in each one of the steps that still keeps the image format in the Lecun example, this is called _Pooling_. The image goes from 256 to 64, 16 (importante to observe that the kernel "copy's" still exists there but also reduced in size, in Lecun example there are 12 of them in all the layers after the input one). This is done intentionally to reduce the computation needed to process afterwards operations with weight and the backpropagation that have to reach each one of the units in all layers.
+
+>There are some types of pooling, but to explain a bit about I got this example of Max (max values between the 4 units in this case) and average whitch would calculate the average of the neighbour units. (The average one is used to blur and have the technical name of gaussian blur)
+
+<!-- Pooling example with stride 2 -->
+{{< figure src="/img/neural_net_2/pooling_stride_2.png" 
+   alt="CNN scheme" 
+   caption="Figure 2 - Multi-unit Multineuron visualization" 
+   align="center" >}}
+
+Them finally in the last layer they use one the nonlinear function (remember that we need to use some sort of nonlinear function like this one otherwise all the neurons we see it's just fancy drawing because mathematically would collapse to one massive matrix operation) $tanh$ to output the most "activated" weight.
+
+>In Lecun work they used the value range for each unit as -1 to 1 considering grayscale, in other words black to white gradient. So because of this the marked range in the $tanh$ is like that. 
+
+<!-- Tanh function example -->
+{{< figure src="/img/neural_net_2/tanh_activation.png" 
+   alt="CNN scheme" 
+   caption="Figure 2 - Multi-unit Multineuron visualization" 
+   align="center" >}}
+
+I created the second image like this to refresh the way the gradiente descent work on the nonlinear/activation function. Using this as a hook to say that Lecun used the mean squared error (MSE) function as the Loss function. As expected, because of the MSE + Tanh can have some behavior that softmax would'nt, like two values close to the activation but it's okay at the end of the day because we can just get the max value itself that will have a satisfying accuracy.
 
 
 
-<!-- ## CNN -->
+
+
+
+
+
+
 <!-- James briggs ref - https://www.youtube.com/watch?v=ZBfpkepdZlw -->
 <!-- RNN | LSTM-->
 <!-- Training at scale (Adam, AdamW) -->
