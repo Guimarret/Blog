@@ -150,7 +150,17 @@ I created the second image like this to refresh the way the gradient descent wor
 
 
 
-<!-- James briggs ref - https://www.youtube.com/watch?v=ZBfpkepdZlw -->
-<!-- RNN | LSTM-->
-<!-- Training at scale (Adam, AdamW) -->
+<!-- Next steps for this post (CNN -> AlexNet arc):
+- Cross-entropy + softmax as the fix for MSE+tanh
+- Backprop through conv layers / weight sharing (brief)
+- Vanishing gradients with tanh/sigmoid -> motivates ReLU
+- Gap years: LeNet-5, AI winter, SVMs displacing NNs for vision
+- AlexNet: ReLU + Dropout + data augmentation + GPUs + ImageNet scale (closes the arc)
+-->
+
+<!-- Post 3 (separate topic, not part of this arc):
+- RNN | LSTM
+- Training at scale (Adam, AdamW, batch norm, LR schedules)
+- James briggs ref - https://www.youtube.com/watch?v=ZBfpkepdZlw
+-->
 <!-- ![Neural Networks](/img/neural_net/neural_networks.png) -->
