@@ -140,22 +140,108 @@ Then finally in the last layer they use a nonlinear function (remember that we n
    caption="Figure 9 - Tanh activation function" 
    align="center" >}}
 
-I created the second image like this to refresh the way the gradient descent works on the nonlinear/activation function. Using this as a hook to say that LeCun used the mean squared error (MSE) function as the loss function. As expected, the MSE + Tanh can have some behavior that softmax wouldn't, like two values close to the activation, but it's okay at the end of the day because we can just get the max value itself, which will have a satisfying accuracy.
+I created the second image like this to refresh the way the gradient descent works on the nonlinear/activation function. Using this as a hook to say that LeCun used the mean squared error (MSE) function as the loss function. As expected, the MSE + Tanh can have some behavior that softmax wouldn't, like two values close to the activation, but it's okay at the end of the day because we can just get the max value itself $argmax()$, which will have a satisfying accuracy.
 
+We already talked about that in the last post but, if you look at the derivative of the tanh, it has the biggest influence in the middle and flattens in the low and high ends. This means the biggest correction only applies when the "activation" is happening in the middle, so if a massive error value lands in it, there's a good chance it gets stuck in the minimal correction.
 
+>We talked about that in the vanishing gradient topic but just refreshing the specific details.
 
+## LeNet-5
 
+In 1998, LeNet-5 was released as the new state of the art for convolutional neural networks. This one improved the accuracy in overall performance and had a more structured and engineered architecture. The training dataset was almost 10x larger, now with 60000 training images, and they used bigger images as inputs. Let's review the changes.
 
+{{< figure src="/img/neural_net_2/lenet-5-architecture.png" 
+   alt="Tanh activation function and its gradient" 
+   caption="Figure 9 - Tanh activation function" 
+   align="center" >}}
 
+Now the input is twice the size, instead of 16 it's 32x32 (with padding so the edge information doesn't get lost after the kernel process). Convolution and subsampling processes are separated (the C subtitle means convolution, S for subsampling, and F for fully connected). More features in the layers, one of which has 6 layers of low-level features, and the following one also has 6 layers but downsamples the previous one (keeps 6 feature maps but reduces the resolution from 28x28 to 14x14).
 
+At convolution 3 they chose a completely different strategy from the original 89's CNN. The feature maps connect differently, using features from the previous sampling. Imagine this like the combination of earlier information. I said that some low-level features could be like lines, edges, etc. Now we want to combine these into newer possible information, like some "higher" level feature based on the previous one. The setup they used is:
+
+- 6 of the C3 maps connect to 3 contiguous feature maps from S2 (maps {0,1,2}, {1,2,3}, {2,3,4}, and so on, wrapping around).
+- 6 more connect to 4 contiguous feature maps from S2.
+- 3 more connect to 4 non-contiguous feature maps from S2.
+- The last 1 connects to all 6 S2 maps.
+
+Now we have a new type of layer that's based on core low-level features to improve the previous processing capacity.
+
+Then we subsample again, reaching S4, which has a dimension of 5x5 with 16 maps. We convolve all of them into 120 independently weighted filters. This is a bit confusing, but they just used all the 16 maps with 5x5px 120x (which each time would be a different filter for the input) to produce 120 units in the layer C5. All the units generated are connected to every pixel in every map, 120 x 16 x 5 x 5, which results in 48120 parameters. These lines connecting everything have unique weights which are gonna be trained later.
+
+Next layer is the fully connected (6) which has 86 units that can be called neurons. Till that layer we used a normal $tanh$ activation function in the training part, but it's gonna change in the next one.
+
+>For curiosity's sake, the 86 number is because 7x12 is the pixel bitmap used to represent stylized ASCII character images, which for now is not that important considering we just read numbers, not full ASCII, but that's the reason for the number.
+
+Finally, the final layer has 10 output values that represent the 0-9 range of numbers. The units don't compute the weighted sum like normal neurons, but the distance. This one is a bit special because they changed the loss function to the Radial Basis Function (RBF).
+
+$$y_i = \sum_{j} (x_j - w_{ij})^2$$
+
+The $x_j$ is the $j$-th value of the last layer's 84-value vector. The $w_{ij}$ is the $j$-th value of the prototype vector, which also has 84 values.
+
+>The prototype vector is a handmade vector that basically draws the digit value in the 7x12 bitmap board so the recognizing system is guided more directly. Also, you can infer that here the system is walking towards a new breakthrough in recognizing. They are setting everything up to expand to all ASCII characters.
+
+Since the measured value in the loss system is distance, the best output value from each sum will be the minimal one, mathematically speaking:
+
+$$\text{predicted class} = \arg\min_i , y_i$$   
+
+### Training system
+
+Considering the minimal distance system, we create a new problem, the chance of the system cheating during training, reaching some average value between all values in the prototype vector. With that, the training and everything would be meaningless.
+
+To solve that they created a modified system for training:
+
+$$E(W) = \frac{1}{P} \sum_{p=1}^{P} \left[ y_{D^p}\left(x^p, W\right) + \log\left( e^{-j} + \sum_i e^{-y_i\left(x^p, W\right)} \right) \right]$$
+
+$P$ is the total number of training examples, $x^p$ is the $p$-th training input, $D^p$ is the correct class label for the training input (if the image had a 6 drawn on it, the class label here would be 6).
+
+The $y_{D^p}$ is the distance to the correct class's prototype, given the training value and the network's current weight $W$. So this one keeps getting smaller during training, so the distance keeps shrinking.
+
+This is added to the first value inside the log, $e^{-j}$, which is a mechanism to prevent the next term from pushing values further. When the value is small enough it becomes indifferent, close to the small $e^{-j}$, so it stops getting smaller (it's like the training incentive is designed not to run past the point where it doesn't change anything in the system). So it just keeps the next term from making the log too small, as a margin.
+
+And the next value in the log is what actually does the job. To make it simple, I put this plot below for intuition. The sum makes it run the operation with the $e$ for all the classes (0-9), so we get the value of $e$ elevated to the _negative_ value of the distance between:
+- Output vector from F6 for the input $x^p$
+- Correct class from the prototype vector
+
+Or simplifying, the distance between the values generated from the training data and the correct vector from the prototype.
+
+The value is negative because we want to train the log to get smaller while the distance from the class increases (to avoid the convergence to an average value I talked about before):
+- If $y_i$ (distance) is small, $e^{-y_i}$ is large.
+- If $y_i$ (distance) is large, $e^{-y_i}$ is close to zero.
+
+{{< figure src="/img/neural_net_2/euler_exponent_neg.png" 
+   alt="Tanh activation function and its gradient" 
+   caption="Figure 9 - Tanh activation function" 
+   align="center" >}}
+
+Wrapping up, since the overall objective $E(W)$ is being minimized, and this term is being added, the training pushes to make this log term small too. Making $\log(\ldots)$ small means making the sum inside small, which means pushing every $e^{-y_i}$ down, which also means pushing every $y_i$ up (larger distances) across all classes.
+
+So, this fights against the risk we talked about, the training system converging to some average value based on the prototype.
+
+## THE CATCH
+
+Now you say, yeah, ok, but why are we getting so deep in this model's design? LeCun's team was good, we already got that, but this is too much, right?
+
+No, and here I say why. This error calculation formula below also looks like a more modern formula that ended up revolutionizing the training system:
+
+If you get the loss formula from LeNet-5 and change $z_i = -y_i$, it becomes (this change means turning the negative distance into a "score", or, the smaller the distance, the bigger the score):
+
+$$E(W) = -z_{D^p} + \log\left( e^{-j} + \sum_i e^{z_i} \right)$$
+
+And if you compare with the standard softmax cross-entropy loss:
+
+$$\text{CE} = -z_{D^p} + \log\left( \sum_i e^{z_i} \right)$$
+
+It's the same shape. The LeCun team basically reinvented the cross-entropy shape years before it became the standard for classification.
+
+>I think this is amazing.
 
 
 <!-- Next steps for this post (CNN -> AlexNet arc):
-- Cross-entropy + softmax as the fix for MSE+tanh
-- Backprop through conv layers / weight sharing (brief)
-- Vanishing gradients with tanh/sigmoid -> motivates ReLU
-- Gap years: LeNet-5, AI winter, SVMs displacing NNs for vision
-- AlexNet: ReLU + Dropout + data augmentation + GPUs + ImageNet scale (closes the arc)
+1. Cross-entropy + softmax as the fix for MSE + RBF
+2. Backprop through conv layers / weight sharing
+3. Vanishing gradients with tanh/sigmoid → motivates ReLU
+4. The gap years: LeNet-5, AI winter, SVMs displacing NNs for vision
+5. AlexNet: closes the arc
 -->
 
 <!-- Post 3 (separate topic, not part of this arc):
