@@ -217,7 +217,7 @@ Wrapping up, since the overall objective $E(W)$ is being minimized, and this ter
 
 So, this fights against the risk we talked about, the training system converging to some average value based on the prototype.
 
-## THE CATCH
+### THE CATCH
 
 Now you say, yeah, ok, but why are we getting so deep in this model's design? LeCun's team was good, we already got that, but this is too much, right?
 
@@ -235,6 +235,25 @@ It's the same shape. The LeCun team basically reinvented the cross-entropy shape
 
 >I think this is amazing.
 
+But later on the CNNs architecture dropped this fixed handmade prototype to use softmax + cross entropy mostly because of generalization possibilities with these one, that doesn't get limited to 0-9 numbers but at some point can cover anything imaginable in images. 
+
+
+The training also flows backwards in the same behavior as before, it also changes the weights in each connection, which in the end amounts to 60k~ updates in each step:
+
+- C1: 6 maps × (5×5 + 1 bias) = 156
+- S2: 6 maps × (1 coefficient + 1 bias) = 12
+- C3: 60 sparse connections × 25 weights + 16 biases = 1,516
+- S4: 16 maps × (1 coefficient + 1 bias) = 32
+- C5: 120 × (16×5×5 + 1 bias) = 48,120
+- F6: 84 × (120 + 1 bias) = 10,164
+
+The activation used in the middle which is $tanh$ has the same problem with any loss function but it's a bit worse with MSE as I said in the last post, the gradient vanishing. The complete utilization of the value only happens in the peak of the middle graph so, usually it just uses part of the calculated value (look at the tanh vs its derivative again that makes more sense), and by calculated value I'm talking about the weight times input plus the bias that scales recursively till the last layer. So the weight updates get smaller as we go backwards. 
+
+Here Rectified Linear Unit (RELU) comes into action for the next steps of the neural network development, it's a simple activation function (non-linear function) that is just $f(x) = max(0,x)$ and this means that if the value is negative it becomes 0 and otherwise it keeps as is. With that there is no shrinking in the value after the activation as happened with $tanh$ because now if the value is positive it goes forward unscated, this also apply to backward propagation because now the weight update don't suffer with gradient vanishing anymore.
+
+The tradeoff here is that RELU can suffer with dead neurons, which are the ones that get stuck at 0 so there is no values to propagate forward or backwards, its becomes a dead road in the middle. 
+
+>The solution is a newer Leaky ReLu which changes the function to $f(x) = max(0.1x, x)$ which create a possibility to recover from becoming a dead neuron, but we can talk about that later.
 
 <!-- Next steps for this post (CNN -> AlexNet arc):
 1. Cross-entropy + softmax as the fix for MSE + RBF
