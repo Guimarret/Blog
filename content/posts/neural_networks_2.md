@@ -9,7 +9,7 @@ math: true
 
 Hello again. Continuing the neural networks trail, today we are gonna take a look at the CNN, RNN and maybe some training at scale implementations.
 
-I didn't explicitly say it, but the last post was mostly the technical and mathematical visualization, focused on building intuition on the matter. The actual application in real life gets more difficult because we also have to be aware of optimizing the training setup, otherwise it's just unusable. If you put yourself back in the late 70's, which is when they were researching and testing the techniques from the last post, the hardware and storage were just too expensive, and for context it is really easy to end up training models that get massively big.
+I didn't explicitly say it, but the last post was mostly the technical and mathematical visualization, focused on building intuition on the matter. The actual application in real life gets more difficult because we also have to be aware of optimizing the training setup, otherwise it's just unusable. If you put yourself back in the late 70s, which is when they were researching and testing the techniques from the last post, the hardware and storage were just too expensive, and for context it is really easy to end up training models that get massively big.
 
 >With that in mind, this post should have less heavy math _but_ more usage of matrices.
 
@@ -65,29 +65,29 @@ This plot is a convex surface and the lines are proceeding towards the minima:
 
 >The SGD in the subtitle is white... I noticed too late, sorry. Also the gradient goes from lowest to highest as blue to orange
 
-We can see the difference in route but they end up at least close to each other in the end. The end here stands for the decreased error surface point.
+We can see the difference in routes but they end up at least close to each other in the end. The end here stands for the decreased error surface point.
 
-This next plot is the comparison between the error calculation and the number of steps. The purpose of this one is to emphasize the increase in steps and the decrease in mathematical complexity for each processing step. It's important to remember that computers are much more efficient at _simpler_ but parallel tasks than at intensive individual tasks, even more so if we consider the GPU (graphics processing unit). As already explained in the memory post, these units are perfect for these matrix calculations, you can parallelize thousands of executions (important to say that execution here doesn't mean steps but smaller steps like weight updates or forward processing for example)
+This next plot is the comparison between the error calculation and the number of steps. The purpose of this one is to emphasize the increase in steps and the decrease in mathematical complexity for each processing step. It's important to remember that computers are much more efficient at _simpler_ but parallel tasks than at intensive individual tasks, even more so if we consider the GPU (graphics processing unit). As already explained in the memory post, these units are perfect for these matrix calculations, and you can parallelize thousands of executions (important to say that execution here doesn't mean steps but smaller steps like weight updates or forward processing for example)
 
 {{< figure src="/img/neural_net_2/comparison_steps.png" 
    alt="Error against the number of steps for each training technique" 
    caption="Figure 3 - Error against the number of steps for each technique" 
    align="center" >}}
 
-But even memory parallelization hits a ceiling. I plotted the relation of the total processing time with the MSE reduction and it gets clear that the curve which reaches the MSE minimal line faster is the mini-batch one.
+But even memory parallelization hits a ceiling. I plotted the relation between the total processing time and the MSE reduction and it gets clear that the curve which reaches the MSE minimal line faster is the mini-batch one.
 
 {{< figure src="/img/neural_net_2/mini_batch_cumulative_wall_clock.png" 
    alt="Cumulative wall-clock time against MSE reduction" 
    caption="Figure 4 - Cumulative wall-clock time against MSE reduction" 
    align="center" >}}
 
-With that in mind we can reach the next step, which is applying all of that to the first industry worldwide usable tool, aka the CNN for recognizing handwriting
+With that in mind, we can reach the next step, which is applying all of that to the first industry-usable tool worldwide, aka the CNN for recognizing handwriting.
 
 # Convolutional Neural Networks (CNN)
 
 The first industry product with real evaluation using neural networks was number and letter handwriting recognition. In the US it was used to help the mail service automate zip codes and also to sort handwritten digits on paper for the financial sector. Earlier, the problem for image processing was the size and the absence of spatial context information, because everything gets flattened.
 
-The intuition for this one is more direct, if you want to evaluate something you have to get the data from somewhere. Naturally you will select the training data to make the output more reliable, BUT if you just select anything as training, the output will also be anything.
+The intuition for this one is more direct. If you want to evaluate something you have to get the data from somewhere. Naturally you will select the training data to make the output more reliable, BUT if you just select anything as training, the output will also be anything.
 
 That said, we want to find a way to train the model to recognize things from an image. To do that, Yann LeCun in 1989 published this solution [link](http://yann.lecun.com/exdb/publis/pdf/lecun-89e.pdf) which basically *IS* the CNN up until 2012 (the year AlexNet was released and things took another route and also exploded into other areas, but we are going to talk about that later). In the article they introduce their setup.
 
@@ -98,20 +98,20 @@ That said, we want to find a way to train the model to recognize things from an 
 
 ## Image, Kernels and Convolution
 
-First things first, "what is a convolution". It is a mathematical operation between two functions that produces a third one, which represents how the second function influences the first one.
+First things first, what is a convolution? It is a mathematical operation between two functions that produces a third one, which represents how the second function influences the first one.
 
-Using the example from 3Blue1Brown in the [convolution video](https://www.youtube.com/watch?v=KuXjwB4LzSA), if you have any curiosity about convolutions, want to dive deeper or want more intuition about what it represents in reality, I recommend the video before the rest of this post.
+If you have any curiosity about convolutions, want to dive deeper, or want more intuition about what it represents in reality, I recommend the [convolution video](https://www.youtube.com/watch?v=KuXjwB4LzSA) from 3Blue1Brown before the rest of this post.
 
 {{< figure src="/img/neural_net_2/convolution_3blue1brown.png" 
    alt="Convolution of a kernel over a Kirby image" 
    caption="Figure 6 - Convolution example from the 3Blue1Brown video" 
    align="center" >}}
 
-You can imagine that the output image of the Kirby represents some spectrum of the original image, like part of the original one but showing a biased type of information. That's part of the purpose, in images, to make some data explicit we use this kernel. For example you can blur the image to reduce its details, or the edge detection in Kirby, which also has two color focuses based on the side, something that can be easily perceived and stands out in the output.
+You can imagine that the output image of Kirby represents some spectrum of the original image, like part of the original one but showing a biased type of information. That's part of the purpose. In images, we use this kernel to make some data explicit. For example, you can blur the image to reduce its details, or run edge detection like in Kirby, which also has two color focuses based on the side, something that can be easily perceived and stands out in the output.
 
 >The function in the middle that applies the changes is called the kernel. This kernel can be seen as a weight matrix from the last post, following the first post's idea (we'll also need to train the weights to be more efficient at some patterns later on). 
 
-But for now let's think about it in the same way as the perceptron, you could manually set up some weights to distinguish a pattern that will output whether your needs are met or not. With that in mind, look at the image context, you could want to find one circle + one diagonal line and say it's a six, but it could be a rotated nine, it could hallucinate some other number or even mistakenly have more than one number in the same image. We want to find a reliable way to find patterns in the whole image without any position, horizontality or verticality restriction. 
+But for now let's think about it in the same way as the perceptron, where you could manually set up some weights to distinguish a pattern that will output whether your needs are met or not. With that in mind, look at the image context. You could want to find one circle + one diagonal line and say it's a six, but it could be a rotated nine, or it could hallucinate some other number, or even mistakenly have more than one number in the same image. We want to find a reliable way to find patterns in the whole image without any position, horizontality or verticality restriction. 
 
 {{< figure src="/img/neural_net_2/kernel_comparison.png" 
    alt="Comparison of different kernels applied to an image" 
@@ -120,7 +120,7 @@ But for now let's think about it in the same way as the perceptron, you could ma
 
 To do that using the LeCun technique from the paper, we run the kernel phase to make features stand out (lines, corners, shades, excess of definition and any possible thing that helps imply what is happening in the block), then run another kernel phase to make them stand out even more, and then compact all the units into a new layer with a small number of units, 30 units, and then do it again into the last layer with 10 units which represent the digits from 0-9.
 
-Diving deeper into technical details now, observe that applying the kernel to the images will halve each spatial dimension in every one of the steps that still keeps the image format in the LeCun example, this is called _Pooling_. Halving each dimension drops the number of units per map to a quarter, so it goes from 256 to 64 to 16 (important to observe that the kernel "copies" still exist there but also reduced in size, in the LeCun example there are 12 of them in all the layers after the input one). This is done intentionally to reduce the computation needed to process the later operations with weights and the backpropagation, which have to reach each one of the units in all layers.
+Diving deeper into technical details now, observe that applying the kernel to the images will halve each spatial dimension in every one of the steps that still keeps the image format in the LeCun example. This is called _Pooling_. Halving each dimension drops the number of units per map to a quarter, so it goes from 256 to 64 to 16 (important to observe that the kernel "copies" still exist there but also reduced in size, and in the LeCun example there are 12 of them in all the layers after the input one). This is done intentionally to reduce the computation needed to process the later operations with weights and the backpropagation, which have to reach each one of the units in all layers.
 
 >There are some types of pooling, but to explain a bit about them I got this example of Max (the max value between the 4 units in this case) and average, which would calculate the average of the neighbouring units. (The average one blurs the image, and since every neighbour gets the same weight it is a box/mean blur)
 
@@ -132,32 +132,32 @@ Diving deeper into technical details now, observe that applying the kernel to th
 
 Then finally in the last layer they use a nonlinear function (remember that we need to use some sort of nonlinear function like this one, otherwise all the neurons we see are just a fancy drawing because mathematically it would collapse into one massive matrix operation), the $tanh$, to output the most "activated" weight.
 
->In LeCun's work they used the value range for each unit as -1 to 1 considering grayscale, in other words a black to white gradient. So because of this the marked range in the $tanh$ is like that. 
+>In LeCun's work they used the value range for each unit as -1 to 1 considering grayscale, in other words a black to white gradient. Because of this, the marked range in the $tanh$ is like that. 
 
 <!-- Tanh function example -->
 {{< figure src="/img/neural_net_2/tanh_activation.png" 
-   alt="Tanh activation function and its gradient" 
-   caption="Figure 9 - Tanh activation function" 
+   alt="Tanh activation function and its derivative" 
+   caption="Figure 9 - Tanh activation function and its derivative" 
    align="center" >}}
 
-I created the second image like this to refresh the way the gradient descent works on the nonlinear/activation function. Using this as a hook to say that LeCun used the mean squared error (MSE) function as the loss function. As expected, the MSE + Tanh can have some behavior that softmax wouldn't, like two values close to the activation, but it's okay at the end of the day because we can just get the max value itself $argmax()$, which will have a satisfying accuracy.
+I created the second image like this to refresh the way the gradient descent works on the nonlinear/activation function, using this as a hook to say that LeCun used the mean squared error (MSE) function as the loss function. As expected, the MSE + Tanh can have some behavior that softmax wouldn't, like two values close to the activation, but it's okay at the end of the day because we can just get the max value itself $argmax()$, which will have a satisfying accuracy.
 
-We already talked about that in the last post but, if you look at the derivative of the tanh, it has the biggest influence in the middle and flattens in the low and high ends. This means the biggest correction only applies when the "activation" is happening in the middle, so if a massive error value lands in it, there's a good chance it gets stuck in the minimal correction.
+We already talked about that in the last post, but if you look at the derivative of the tanh, it has the biggest influence in the middle and flattens in the low and high ends. This means the biggest correction only applies when the "activation" is happening in the middle, so if a massive error value lands in it, there's a good chance it gets stuck in the minimal correction.
 
 >We talked about that in the vanishing gradient topic but just refreshing the specific details.
 
 ## LeNet-5
 
-In 1998, LeNet-5 was released as the new state of the art for convolutional neural networks. This one improved the accuracy in overall performance and had a more structured and engineered architecture. The training dataset was almost 10x larger, now with 60000 training images, and they used bigger images as inputs. Let's review the changes.
+In 1998, LeNet-5 was released as the new state of the art for convolutional neural networks. This one improved the accuracy in overall performance and had a more structured and engineered architecture. The training dataset was almost 10x larger, now with 60,000 training images, and they used bigger images as inputs. Let's review the changes.
 
 {{< figure src="/img/neural_net_2/lenet-5-architecture.png" 
-   alt="Tanh activation function and its gradient" 
-   caption="Figure 9 - Tanh activation function" 
+   alt="LeNet-5 architecture diagram" 
+   caption="Figure 10 - LeNet-5 architecture" 
    align="center" >}}
 
-Now the input is twice the size, instead of 16 it's 32x32 (with padding so the edge information doesn't get lost after the kernel process). Convolution and subsampling processes are separated (the C subtitle means convolution, S for subsampling, and F for fully connected). More features in the layers, one of which has 6 layers of low-level features, and the following one also has 6 layers but downsamples the previous one (keeps 6 feature maps but reduces the resolution from 28x28 to 14x14).
+Now the input is twice the size, going from 16x16 to 32x32 (with padding so the edge information doesn't get lost after the kernel process). Convolution and subsampling processes are separated (the C subtitle means convolution, S for subsampling, and F for fully connected). There are more features in the layers, one of which has 6 layers of low-level features, and the following one also has 6 layers but downsamples the previous one (keeps 6 feature maps but reduces the resolution from 28x28 to 14x14).
 
-At convolution 3 they chose a completely different strategy from the original 89's CNN. The feature maps connect differently, using features from the previous sampling. Imagine this like the combination of earlier information. I said that some low-level features could be like lines, edges, etc. Now we want to combine these into newer possible information, like some "higher" level feature based on the previous one. The setup they used is:
+At convolution 3 they chose a completely different strategy from the original '89 CNN. The feature maps connect differently, using features from the previous sampling. Imagine this like the combination of earlier information. I said that some low-level features could be like lines, edges, etc. Now we want to combine these into newer possible information, like some "higher" level feature based on the previous one. The setup they used is:
 
 - 6 of the C3 maps connect to 3 contiguous feature maps from S2 (maps {0,1,2}, {1,2,3}, {2,3,4}, and so on, wrapping around).
 - 6 more connect to 4 contiguous feature maps from S2.
@@ -166,9 +166,9 @@ At convolution 3 they chose a completely different strategy from the original 89
 
 Now we have a new type of layer that's based on core low-level features to improve the previous processing capacity.
 
-Then we subsample again, reaching S4, which has a dimension of 5x5 with 16 maps. We convolve all of them into 120 independently weighted filters. This is a bit confusing, but they just used all the 16 maps with 5x5px 120x (which each time would be a different filter for the input) to produce 120 units in the layer C5. All the units generated are connected to every pixel in every map, 120 x 16 x 5 x 5, which results in 48120 parameters. These lines connecting everything have unique weights which are gonna be trained later.
+Then we subsample again, reaching S4, which has a dimension of 5x5 with 16 maps. We convolve all of them into 120 independently weighted filters. This is a bit confusing, but they just used all the 16 maps with 5x5px 120x (which each time would be a different filter for the input) to produce 120 units in the layer C5. All the units generated are connected to every pixel in every map, 120 x 16 x 5 x 5, which results in 48,120 parameters. These lines connecting everything have unique weights which are gonna be trained later.
 
-Next layer is the fully connected (6) which has 86 units that can be called neurons. Till that layer we used a normal $tanh$ activation function in the training part, but it's gonna change in the next one.
+The next layer is F6, the fully connected layer, which has 86 units that can be called neurons. Till that layer we used a normal $tanh$ activation function in the training part, but it's gonna change in the next one.
 
 >For curiosity's sake, the 86 number is because 7x12 is the pixel bitmap used to represent stylized ASCII character images, which for now is not that important considering we just read numbers, not full ASCII, but that's the reason for the number.
 
@@ -209,8 +209,8 @@ The value is negative because we want to train the log to get smaller while the 
 - If $y_i$ (distance) is large, $e^{-y_i}$ is close to zero.
 
 {{< figure src="/img/neural_net_2/euler_exponent_neg.png" 
-   alt="Tanh activation function and its gradient" 
-   caption="Figure 9 - Tanh activation function" 
+   alt="Plot of e to the negative y_i against the distance y_i" 
+   caption="Figure 11 - e^{-y_i} decay as the distance y_i increases" 
    align="center" >}}
 
 Wrapping up, since the overall objective $E(W)$ is being minimized, and this term is being added, the training pushes to make this log term small too. Making $\log(\ldots)$ small means making the sum inside small, which means pushing every $e^{-y_i}$ down, which also means pushing every $y_i$ up (larger distances) across all classes.
@@ -237,6 +237,7 @@ It's the same shape. The LeCun team basically reinvented the cross-entropy shape
 
 But later on the CNNs architecture dropped this fixed handmade prototype to use softmax + cross entropy mostly because of generalization possibilities with these one, that doesn't get limited to 0-9 numbers but at some point can cover anything imaginable in images. 
 
+### Training 
 
 The training also flows backwards in the same behavior as before, it also changes the weights in each connection, which in the end amounts to 60k~ updates in each step:
 
@@ -247,6 +248,21 @@ The training also flows backwards in the same behavior as before, it also change
 - C5: 120 × (16×5×5 + 1 bias) = 48,120
 - F6: 84 × (120 + 1 bias) = 10,164
 
+There's also parameter sharing going on for the layer before the kernel, not just for the kernel's own weights. Makes sense if you think about the hardware of the time, computation was scarce, so reusing the same few weights across every sliding position instead of having one weight per connection saves a ton of work. The backprop side of this is pretty trivial once it clicks. Since one input unit feeds into multiple output positions (and every kernel scanning it), the error sent back to that unit is just the sum of every connection it took part in, error times weight, across all of them. That translate mathematically as:
+
+$$\sum_{k} \delta_{o_k} \cdot w_k$$
+
+And visually as:
+
+{{< figure src="/img/neural_net_2/cnn_weight_sharing_backprop.png" 
+   alt="Diagram of the error propagating back through shared kernel weights to the previous layer" 
+   caption="Figure 12 - Error propagation through shared weights to the layer before" 
+   align="center" >}}
+
+
+
+### Vanishing gradient
+
 The activation used in the middle which is $tanh$ has the same problem with any loss function but it's a bit worse with MSE as I said in the last post, the gradient vanishing. The complete utilization of the value only happens in the peak of the middle graph so, usually it just uses part of the calculated value (look at the tanh vs its derivative again that makes more sense), and by calculated value I'm talking about the weight times input plus the bias that scales recursively till the last layer. So the weight updates get smaller as we go backwards. 
 
 Here Rectified Linear Unit (RELU) comes into action for the next steps of the neural network development, it's a simple activation function (non-linear function) that is just $f(x) = max(0,x)$ and this means that if the value is negative it becomes 0 and otherwise it keeps as is. With that there is no shrinking in the value after the activation as happened with $tanh$ because now if the value is positive it goes forward unscated, this also apply to backward propagation because now the weight update don't suffer with gradient vanishing anymore.
@@ -255,11 +271,10 @@ The tradeoff here is that RELU can suffer with dead neurons, which are the ones 
 
 >The solution is a newer Leaky ReLu which changes the function to $f(x) = max(0.1x, x)$ which create a possibility to recover from becoming a dead neuron, but we can talk about that later.
 
+## AI winter
+
 <!-- Next steps for this post (CNN -> AlexNet arc):
-1. Cross-entropy + softmax as the fix for MSE + RBF
-2. Backprop through conv layers / weight sharing
-3. Vanishing gradients with tanh/sigmoid → motivates ReLU
-4. The gap years: LeNet-5, AI winter, SVMs displacing NNs for vision
+4. The gap years: AI winter, SVMs displacing NNs for vision
 5. AlexNet: closes the arc
 -->
 
@@ -269,3 +284,4 @@ The tradeoff here is that RELU can suffer with dead neurons, which are the ones 
 - James briggs ref - https://www.youtube.com/watch?v=ZBfpkepdZlw
 -->
 <!-- ![Neural Networks](/img/neural_net/neural_networks.png) -->
+____
