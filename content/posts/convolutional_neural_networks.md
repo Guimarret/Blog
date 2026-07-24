@@ -7,7 +7,9 @@ math: true
 
 # Foundation
 
-Hello again. Continuing the neural networks trail, today we are gonna take a look at the CNN, RNN and maybe some training at scale implementations.
+Hello again. Continuing the neural networks trail, today we are gonna take a look at the CNN.
+
+> I expected to cover more on neural networks, but it got too long, so the rest is gonna be covered in future posts.
 
 I didn't explicitly say it, but the last post was mostly the technical and mathematical visualization, focused on building intuition on the matter. The actual application in real life gets more difficult because we also have to be aware of optimizing the training setup, otherwise it's just unusable. If you put yourself back in the late 70s, which is when they were researching and testing the techniques from the last post, the hardware and storage were just too expensive, and for context it is really easy to end up training models that get massively big.
 
@@ -368,6 +370,16 @@ The dropout rate is decided by testing in each architecture, but in AlexNet they
 This one took more time than I expected even when I started to dedicate myself completely, so sorry for the incorrect time estimate in the video (3 days later).
 
 Also, many thanks to my friends that keep cheering for me in continuing this process, which is so good. I love studying, and this makes it more dynamic because people drop some questions sometimes, and it's always a pleasure to answer. See ya.
+
+## References
+
+**Papers**
+- [LeCun et al., 1989](http://yann.lecun.com/exdb/publis/pdf/lecun-89e.pdf), the original CNN paper.
+- [Krizhevsky, Sutskever & Hinton, 2012](https://proceedings.neurips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf), the AlexNet paper.
+
+**Recommended videos**
+- [3Blue1Brown, convolutions](https://www.youtube.com/watch?v=KuXjwB4LzSA)
+- [3Blue1Brown, cross-entropy](https://youtu.be/GlYgs6v2YfU?si=cRBTqXeQL4hiuawN)
 
 
 <!-- Post 3 (separate topic, not part of this arc):
