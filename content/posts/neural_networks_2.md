@@ -168,9 +168,9 @@ Now we have a new type of layer that's based on core low-level features to impro
 
 Then we subsample again, reaching S4, which has a dimension of 5x5 with 16 maps. We convolve all of them into 120 independently weighted filters. This is a bit confusing, but they just used all the 16 maps with 5x5px 120x (which each time would be a different filter for the input) to produce 120 units in the layer C5. All the units generated are connected to every pixel in every map, 120 x 16 x 5 x 5, which results in 48,120 parameters. These lines connecting everything have unique weights which are gonna be trained later.
 
-The next layer is F6, the fully connected layer, which has 86 units that can be called neurons. Till that layer we used a normal $tanh$ activation function in the training part, but it's gonna change in the next one.
+The next layer is F6, the fully connected layer, which has 84 units that can be called neurons. Till that layer we used a normal $tanh$ activation function in the training part, but it's gonna change in the next one.
 
->For curiosity's sake, the 86 number is because 7x12 is the pixel bitmap used to represent stylized ASCII character images, which for now is not that important considering we just read numbers, not full ASCII, but that's the reason for the number.
+>For curiosity's sake, the 84 number is because 7x12 is the pixel bitmap used to represent stylized ASCII character images, which for now is not that important considering we just read numbers, not full ASCII, but that's the reason for the number.
 
 Finally, the final layer has 10 output values that represent the 0-9 range of numbers. The units don't compute the weighted sum like normal neurons, but the distance. This one is a bit special because they changed the loss function to the Radial Basis Function (RBF).
 
@@ -194,7 +194,7 @@ $$E(W) = \frac{1}{P} \sum_{p=1}^{P} \left[ y_{D^p}\left(x^p, W\right) + \log\lef
 
 $P$ is the total number of training examples, $x^p$ is the $p$-th training input, $D^p$ is the correct class label for the training input (if the image had a 6 drawn on it, the class label here would be 6).
 
-The $y_{D^p}$ is the distance to the correct class's prototype, given the training value and the network's current weight $W$. So this one keeps getting smaller during training, so the distance keeps shrinking.
+The $y_{D^p}$ is the distance to the correct class's prototype, given the training value and the network's current weight $W$. So this one keeps getting smaller during training, meaning the distance keeps shrinking.
 
 This is added to the first value inside the log, $e^{-j}$, which is a mechanism to prevent the next term from pushing values further. When the value is small enough it becomes indifferent, close to the small $e^{-j}$, so it stops getting smaller (it's like the training incentive is designed not to run past the point where it doesn't change anything in the system). So it just keeps the next term from making the log too small, as a margin.
 
@@ -202,7 +202,7 @@ And the next value in the log is what actually does the job. To make it simple, 
 - Output vector from F6 for the input $x^p$
 - Correct class from the prototype vector
 
-Or simplifying, the distance between the values generated from the training data and the correct vector from the prototype.
+Or simplifying, it's the distance between the values generated from the training data and the correct vector from the prototype.
 
 The value is negative because we want to train the log to get smaller while the distance from the class increases (to avoid the convergence to an average value I talked about before):
 - If $y_i$ (distance) is small, $e^{-y_i}$ is large.
@@ -235,11 +235,11 @@ It's the same shape. The LeCun team basically reinvented the cross-entropy shape
 
 >I think this is amazing.
 
-But later on the CNNs architecture dropped this fixed handmade prototype to use softmax + cross entropy mostly because of generalization possibilities with these one, that doesn't get limited to 0-9 numbers but at some point can cover anything imaginable in images. 
+But later on the CNN architecture dropped this fixed handmade prototype to use softmax + cross entropy mostly because of generalization possibilities with this one, which doesn't get limited to 0-9 numbers but at some point can cover anything imaginable in images. 
 
 ### Training 
 
-The training also flows backwards in the same behavior as before, it also changes the weights in each connection, which in the end amounts to 60k~ updates in each step:
+The training also flows backwards in the same behavior as before. It also changes the weights in each connection, which in the end amounts to ~60k updates in each step:
 
 - C1: 6 maps × (5×5 + 1 bias) = 156
 - S2: 6 maps × (1 coefficient + 1 bias) = 12
@@ -248,7 +248,7 @@ The training also flows backwards in the same behavior as before, it also change
 - C5: 120 × (16×5×5 + 1 bias) = 48,120
 - F6: 84 × (120 + 1 bias) = 10,164
 
-There's also parameter sharing going on for the layer before the kernel, not just for the kernel's own weights. Makes sense if you think about the hardware of the time, computation was scarce, so reusing the same few weights across every sliding position instead of having one weight per connection saves a ton of work. The backprop side of this is pretty trivial once it clicks. Since one input unit feeds into multiple output positions (and every kernel scanning it), the error sent back to that unit is just the sum of every connection it took part in, error times weight, across all of them. That translate mathematically as:
+There's also parameter sharing going on for the layer before the kernel, not just for the kernel's own weights. It makes sense if you think about the hardware of the time, when computation was scarce, so reusing the same few weights across every sliding position instead of having one weight per connection saves a ton of work. The backprop side of this is pretty trivial once it clicks. Since one input unit feeds into multiple output positions (and every kernel scanning it), the error sent back to that unit is just the sum of every connection it took part in, error times weight, across all of them. That translates mathematically as:
 
 $$\sum_{k} \delta_{o_k} \cdot w_k$$
 
@@ -259,24 +259,116 @@ And visually as:
    caption="Figure 12 - Error propagation through shared weights to the layer before" 
    align="center" >}}
 
-
-
 ### Vanishing gradient
 
-The activation used in the middle which is $tanh$ has the same problem with any loss function but it's a bit worse with MSE as I said in the last post, the gradient vanishing. The complete utilization of the value only happens in the peak of the middle graph so, usually it just uses part of the calculated value (look at the tanh vs its derivative again that makes more sense), and by calculated value I'm talking about the weight times input plus the bias that scales recursively till the last layer. So the weight updates get smaller as we go backwards. 
+The activation used in the middle, which is $tanh$, has the same problem with any loss function, but it's a bit worse with MSE, as I said in the last post, the gradient vanishing. The complete utilization of the value only happens in the peak of the middle graph, so usually it just uses part of the calculated value (look at the tanh vs its derivative again that makes more sense), and by calculated value I'm talking about the weight times input plus the bias that scales recursively till the last layer. So the weight updates get smaller as we go backwards. 
 
-Here Rectified Linear Unit (RELU) comes into action for the next steps of the neural network development, it's a simple activation function (non-linear function) that is just $f(x) = max(0,x)$ and this means that if the value is negative it becomes 0 and otherwise it keeps as is. With that there is no shrinking in the value after the activation as happened with $tanh$ because now if the value is positive it goes forward unscated, this also apply to backward propagation because now the weight update don't suffer with gradient vanishing anymore.
+Here Rectified Linear Unit (ReLU) comes into action for the next steps of the neural network development. It's a simple activation function (non-linear function) that is just $f(x) = max(0,x)$, and this means that if the value is negative it becomes 0, and otherwise it keeps as is. With that, there is no shrinking in the value after the activation as happened with $tanh$, because now if the value is positive it goes forward unscathed. This also applies to backward propagation, because now the weight update doesn't suffer from gradient vanishing anymore.
 
-The tradeoff here is that RELU can suffer with dead neurons, which are the ones that get stuck at 0 so there is no values to propagate forward or backwards, its becomes a dead road in the middle. 
+The tradeoff here is that ReLU can suffer from dead neurons, which are the ones that get stuck at 0, so there are no values to propagate forward or backwards, it becomes a dead road in the middle. 
 
->The solution is a newer Leaky ReLu which changes the function to $f(x) = max(0.1x, x)$ which create a possibility to recover from becoming a dead neuron, but we can talk about that later.
+>The solution is a newer Leaky ReLU, which changes the function to $f(x) = max(0.1x, x)$, which creates a possibility to recover from becoming a dead neuron, but we can talk about that later.
 
 ## AI winter
 
-<!-- Next steps for this post (CNN -> AlexNet arc):
-4. The gap years: AI winter, SVMs displacing NNs for vision
-5. AlexNet: closes the arc
--->
+After the LeNet-5 article's release in 1998, the hype vanished for more than a decade. If you think about that, it's basically because the theoretical field was much ahead of the practical. The training was too expensive, and the datasets available were too small for other breakthroughs. ImageNet only surfaced in 2009, which is a big dataset with images in higher quality, more labels and some diversification.
+
+>In the LeNet-5 article there were some propositions for the next steps, which could recognize more numbers in one forward pass and possibly recognize ASCII in general in the future, but at the moment were just theoretical propositions.
+
+Also, in the last layer they used the RBF, but in the middle layers the $tanh$ kept being used. As we already talked about before, the vanishing gradient was another blocker to improving horizontal scaling (adding more layers). Another important context is that GPUs started being used for general computation later too. CUDA from NVIDIA just came to the surface in 2007, and the ML community took a couple more years to make use of that and actually build things to be used there.
+
+With all these things happening, the funding became smaller in comparison, and therefore the number of people involved also got reduced. Add to that some alternatives that were simple and almost ready to apply in the industry, involving SVMs (Support Vector Machines), trees like AdaBoost and gradient boosting (gonna talk more about that in another post focused on statistics and calculations I guess). There were almost no reasons left to stay attached to the idea of improving the neural nets.
+
+## AlexNet
+
+After all this lukewarm season of no breakthrough in the neural net, during the ImageNet competition in 2012 a new architecture was released and won the competition. This one is AlexNet, which got ahead of the second contender by a margin of 10.9%, which is amazing by itself considering a high-level competition like this one. They reached a 15.3% error rate in a model classifying 1,000 different categories.
+
+The architecture they used is:
+
+{{< figure src="/img/neural_net_2/alexnet_architecture.png" 
+   alt="AlexNet architecture diagram" 
+   caption="Figure 13 - AlexNet architecture" 
+   attr="Source: Packt"
+   attrlink="https://subscription.packtpub.com/book/data/9781789956177/5/ch05lvl1sec13/introducing-alexnet"
+   align="center" >}}
+
+We can see that the basis we talked about before is still here. There are more layers, the images are denser in pixels (RGB so 3 layers for each image), and the convolutions are bigger, but that's all there is to it. The convolution with stride I already explained before, and now it uses stride, the pace at which the kernel moves in the image, now with 3 layers.
+
+The notation in the kernel stride: 96x11x11 means 96 kernels in each layer and 11x11 is the actual size of the kernel. About the three dimensions from the color (RGB), it gets compressed, so the kernel passes by and sums the three of them.
+
+The max pool that appears 3 times is the type of pooling/subsampling which just gets the max value from the sampled region. Here's an example in the image below with max and average pooling:
+
+{{< figure src="/img/neural_net_2/max_pooling.png" 
+   alt="Illustration of max pooling and average pooling" 
+   caption="Figure 14 - Max pooling and average pooling" 
+   attr="Source: ResearchGate"
+   attrlink="https://www.researchgate.net/figure/llustration-of-Max-Pooling-and-Average-Pooling-Figure-2-above-shows-an-example-of-max_fig2_333593451"
+   align="center" >}}
+
+For the architecture that's all. It just increased the amount of convolution, pooling and fully connected layers. Besides that, now we have bigger images as input and the RGB feature, which opens precedent to train based on colors, too.
+
+### Training
+
+Here it improves in many ways, but there are only a few genuinely new things considering the observations done previously in this post. They dropped the $tanh$ and started to use ReLU to solve the problem of vanishing gradient, which is one of the reasons it can be this much bigger in the number of layers. The loss function is now the real softmax + multinomial cross-entropy (also known as categorical cross-entropy loss), which is basically the shape LeNet-5's loss already had, just without the RBF prototypes.
+
+Binary cross-entropy (single output, two classes):
+$$L = -\left[y \log(\hat{y}) + (1-y)\log(1-\hat{y})\right]$$
+
+Where $y$ is the true label (0 or 1) and $\hat{y}$ is the predicted probability (usually from the activation function).
+
+
+Categorical cross-entropy (multiple classes, softmax output):
+
+$$L = -\sum_{i=1}^{C} y_i \log(\hat{y}_i)$$
+
+Where $C$ is the number of classes, $y_i$ is 1 for the correct class and 0 for all others and $\hat{y}_i$ is the predicted probability for class $i$ from softmax. Since $y_i$ is 0 everywhere except the correct class $D$, this collapses to:
+
+$$L = -\log(\hat{y}_D)$$
+
+>Again, I recommend a video from 3blue1brown that Grant Sanderson, again, left me speechless, so here is the [link](https://youtu.be/GlYgs6v2YfU?si=cRBTqXeQL4hiuawN). In this video he talks about cross-entropy and develops the intuition on how it works with real use cases and concrete math proofs. (He skips the Lagrange part but it's absolutely understandable in the video).
+
+By the way, this has the same shape as the entropy function I showed before, the RBF. But now it changed the $e^{z_i}$ to the softmax function, which comes from $\hat{y}_i = \text{softmax}(z)_i$.
+
+The softmax function is basically a normalization function, which is gonna take all the values input $z_i$ (consider the values being the class activation) and flatten them to make the sum of all of them equal one, so if you take the max value it's also gonna represent the activation as a percentage.
+
+$$\text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{C} e^{z_j}}$$
+
+The function only gets simplified this much in the loss function, because that's the only place where the correct value is the only one class, so the other ones get canceled out by multiplying by 0. Here that's not the case yet, it just flattens everything with the respective values being proportional to the max possible value of 1 or 100%.
+
+Besides ReLU and cross-entropy, there are two completely new things: local response normalization (RN) and dropout.
+
+### Local response normalization
+
+The RN is placed after the ReLU activations. Its purpose is to inhibit the neighbor neurons (vide kernels) based on the activation. For example, if one neuron activates strongly it inhibits other channels (by channels I mean the lateral block, there are multiple kernels, the output of these kernels have the same size and so on, and these are called the channels). The goal with this normalization is to make the pattern being recognized in the other channels different. If one neuron is strongly assigning something to that place, it means the other channels should look for different patterns.
+
+>This worked and improved the accuracy by 1-2%, which is really good, but later we stopped using this model for more efficient ones.
+
+The mathematics look a bit scary but it's simple after you understand what each variable means:
+
+$$b_{x,y}^i = \frac{a_{x,y}^i}{\left(k + \alpha \sum_{j=\max(0, i-n/2)}^{\min(N-1, i+n/2)} \left(a_{x,y}^j\right)^2\right)^\beta}$$
+
+- $a_{x,y}^i$ is the activity of a neuron computed by kernel $i$ at spatial position $(x,y)$ (remember we are talking about images x,y is just the coordinate of the 2 dimension image)
+- $b_{x,y}^i$ is the normalized output (just the result)
+- $N$ is the total number of kernels (feature maps) in that layer
+- $n$ is the size of the neighboring kernel window used for normalization (kernels adjacent in index, not spatially)
+- $k$, $\alpha$, $\beta$ are hyperparameters 
+
+In AlexNet the parameters used were: $k=2$, $n=5$, $\alpha=10^{-4}$, $\beta=0.75$
+
+This one works well and all, but as I said, later on we found more efficient ones, and these are Batch Normalization and Layer Normalization.
+
+### Dropout
+
+This one is still active in basically every deep learning and neural network in general. It's a system that during training randomly zeroes/drops part of the neurons to make it rely less on neighbour neurons. It works to keep the information concentrated in individual neurons instead of spread across a sequence, for example. It also helps prevent overfitting, which in the case of AlexNet was expected with ~60M parameters and 1.2M images.
+
+The dropout rate is decided by testing in each architecture, but in AlexNet they used $p = 0.5$ (also only applied to the first two fully connected layers, which were FC6 and FC7). This means that in this case the chance of a neuron being dropped in each step is 50%.
+
+### Finishing
+
+This one took more time than I expected even when I started to dedicate myself completely, so sorry for the incorrect time estimate in the video (3 days later).
+
+Also, many thanks to my friends that keep cheering for me in continuing this process, which is so good. I love studying, and this makes it more dynamic because people drop some questions sometimes, and it's always a pleasure to answer. See ya.
+
 
 <!-- Post 3 (separate topic, not part of this arc):
 - RNN | LSTM
