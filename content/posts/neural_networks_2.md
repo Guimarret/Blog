@@ -1,7 +1,7 @@
 ---
-title: "Neural networks 2"
+title: "Convolutional neural networks"
 date: 2026-06-19T12:25:58-03:00
-draft: true
+draft: false
 math: true
 ---
 
