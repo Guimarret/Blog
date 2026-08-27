@@ -41,6 +41,7 @@ params:
   defaultTheme: auto
   disableThemeToggle: false
   ShowShareButtons: true
+  ShareButtons: ["linkedin"]
   ShowReadingTime: true
   disableSpecial1stPost: false
   displayFullLangName: true

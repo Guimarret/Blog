@@ -1,0 +1,29 @@
+/* Wide math must scroll inside its own box instead of stretching the page.
+   Without this a single long equation widens the whole document on mobile,
+   which zooms the layout out and breaks the formatting. */
+
+mjx-container[display="true"],
+.MathJax_Display,
+.katex-display {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* room for the scrollbar so it never sits on top of the glyphs */
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Long inline formulas scroll on their own instead of widening the column.
+   MathJax sets vertical-align on the container itself, so the baseline of
+   inline math is unaffected by making this a scroll box. */
+mjx-container:not([display="true"]) {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Last-resort guard: nothing in a post may push the page wider than the screen. */
+.post-content {
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
