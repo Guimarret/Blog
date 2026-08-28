@@ -20,7 +20,7 @@ p-type
 By the way, that doesn't mean they are actually positive and negative, but neutral, because of the number of electrons and protons inside
 
 ### Transistor are made of P-Type and N-Type doping 
-{{< figure src="/img/transistor/transistor.png"
+{{< figure src="/img/transistor/transistor.webp"
    alt="Transistor made of P-type and N-type doped silicon with a gate contact isolated by an oxide layer"
    caption="Figure 1 - Transistor built from P-type and N-type doping"
    align="center" >}}

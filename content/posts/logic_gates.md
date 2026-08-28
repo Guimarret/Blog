@@ -21,28 +21,28 @@ So logic gates are simply a transistor sequence that creates properties (AND, OR
 
 Transistor level approach:
 - AND (The first input and the second simultaneously):
-    {{< figure src="/img/logic_gates/and.png"
+    {{< figure src="/img/logic_gates/and.webp"
        alt="AND gate built from transistors at the transistor level"
        caption="Figure 1 - AND gate (transistor level)"
        align="center" >}}
 - OR (The first input, the second, or both):
-    {{< figure src="/img/logic_gates/or.png"
+    {{< figure src="/img/logic_gates/or.webp"
        alt="OR gate built from transistors at the transistor level"
        caption="Figure 2 - OR gate (transistor level)"
        align="center" >}}
 - NAND (The first input, the second, or none of them):
-    {{< figure src="/img/logic_gates/nand.png"
+    {{< figure src="/img/logic_gates/nand.webp"
        alt="NAND gate built from transistors at the transistor level"
        caption="Figure 3 - NAND gate (transistor level)"
        align="center" >}}
 - NOR (Both of them off):
-    {{< figure src="/img/logic_gates/nor.png"
+    {{< figure src="/img/logic_gates/nor.webp"
        alt="NOR gate built from transistors at the transistor level"
        caption="Figure 4 - NOR gate (transistor level)"
        align="center" >}}
 
 Truth tables:
-{{< figure src="/img/logic_gates/logic_gates.png"
+{{< figure src="/img/logic_gates/logic_gates.webp"
    alt="Truth tables for the AND, OR, NAND, NOR, XOR and XNOR logic gates"
    caption="Figure 5 - Logic gate truth tables"
    align="center" >}}
@@ -63,13 +63,13 @@ Now I'm gonna take a more practical approach with something more easily understa
 <a href="https://byjus.com/maths/binary-operation/" target="_blank"> site </a> can help.
 
 The adders use this logic gate setup (I'm gonna start using these images with the minimal representation of the logic gates, because it would become bothersome to use so much space with logic gates at transistor level):
-{{< figure src="/img/logic_gates/adder.png"
+{{< figure src="/img/logic_gates/adder.webp"
    alt="Full adder built from the minimal representation of logic gates"
    caption="Figure 6 - Full adder built from logic gates"
    align="center" >}}
 
 The adder receives 3 inputs, the binary of the first number, the second, and the "carry-in" (cin), but if it's the first comparison the cin is ignored, because the carry-in is the carried number from the last operation, aka the COUT that appears at the end of the circuit. So, for a better visualization, this is the truth table:
-{{< figure src="/img/logic_gates/adder_truth_table.png"
+{{< figure src="/img/logic_gates/adder_truth_table.webp"
    alt="Truth table of the full adder with inputs A, B, carry-in and outputs S and carry-out"
    caption="Figure 7 - Adder truth table"
    align="center" >}}
@@ -89,14 +89,14 @@ There are also two types of circuits for subtractors, the full subtractor and th
 
 The logic circuit of the subtractor (the full one, because it's more useful and interesting)
 
-{{< figure src="/img/logic_gates/circuit_logic_subtractor.png"
+{{< figure src="/img/logic_gates/circuit_logic_subtractor.webp"
    alt="Full subtractor logic circuit built from logic gates"
    caption="Figure 8 - Full subtractor logic circuit"
    align="center" >}}
 
 The truth table of the subtractor:
 
-{{< figure src="/img/logic_gates/subtractor_full.png"
+{{< figure src="/img/logic_gates/subtractor_full.webp"
    alt="Truth table of the full subtractor with inputs, borrow-in and the difference and borrow-out outputs"
    caption="Figure 9 - Full subtractor truth table"
    align="center" >}}
@@ -110,7 +110,7 @@ If you want to go deeper into the subtractors I recommend this <a href="https://
 First things first, the multiplication consists of multiple comparisons between the multiplicand and the multiplier, and the number of runs of the circuit depends on the binary bit/byte "size".
 
 For example:
-{{< figure src="/img/logic_gates/binary_multiplication.png"
+{{< figure src="/img/logic_gates/binary_multiplication.webp"
    alt="Example of binary multiplication done as a series of shifts and additions"
    caption="Figure 10 - Binary multiplication example"
    attr="Source: circuitdigest.com"
@@ -124,14 +124,14 @@ Then we reach the complex part, the logic circuit, because theoretically we coul
 So, continuing..
 This is the logic circuit for a multiplier with 2-bit numbers
 
-{{< figure src="/img/logic_gates/multiplier_logic_gate.png"
+{{< figure src="/img/logic_gates/multiplier_logic_gate.webp"
    alt="Logic circuit of a 2-bit multiplier built from AND gates and adders"
    caption="Figure 11 - 2-bit multiplier logic circuit"
    align="center" >}}
 
 And here is the truth table:
 
-{{< figure src="/img/logic_gates/truth_table_multiplier.png"
+{{< figure src="/img/logic_gates/truth_table_multiplier.webp"
    alt="Truth table of the 2-bit multiplier with its inputs and product outputs"
    caption="Figure 12 - Multiplier truth table"
    align="center" >}}
@@ -152,7 +152,7 @@ Because if we think about it a little, we reach the conclusion that division by 
 
 So, to keep the same schema as the multiplier, we are gonna use the 2-bit division:
 
-{{< figure src="/img/logic_gates/two_bit_binary_division_circuit.png"
+{{< figure src="/img/logic_gates/two_bit_binary_division_circuit.webp"
    alt="2-bit binary division circuit built using only AND and XOR logic gates"
    caption="Figure 14 - 2-bit binary division circuit"
    align="center" >}}

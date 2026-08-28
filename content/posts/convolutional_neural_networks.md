@@ -21,7 +21,7 @@ Let's start with calculating the activation of some layer using matrices (will m
 
 Using the neural network from the last post:
 
-{{< figure src="/img/neural_net/multilayer_multiunit.png" 
+{{< figure src="/img/neural_net/multilayer_multiunit.webp" 
    alt="Multilayer, multi-unit neural network diagram" 
    caption="Figure 1 - Multilayer, multi-unit neural network from the last post" 
    align="center" >}}
@@ -43,10 +43,13 @@ $$\begin{bmatrix} a_0^{(L)} \\ a_1^{(L)} \end{bmatrix} = \sigma \left( \begin{bm
 Simpler, right? Now we can visualize everything in one block without getting too much information.
 
 >Reminder, matrices are represented in row and column, $M_{RowxColumn}$. 
+{.no-drawing}
 
 >Multiplying two matrices $M_{2x3}$ and $N_{3x1}$, the output takes the rows of the first and the columns of the second, so MxN = $R_{2x1}$ (which is our case)
 
+
 >Summing matrices keeps the dimensions and just sums element by element.
+{.no-drawing}
 
 You can also think of it like this: for each activation neuron there will be one row of weights, one column of activations from the last layer with N rows, and one column with one bias for each activation neuron.
 
@@ -60,7 +63,7 @@ Dotting the i's and crossing the t's, the gradient descent calculated based on t
 
 This plot is a convex surface and the lines are proceeding towards the minima:
 
-{{< figure src="/img/neural_net_2/training_techniques_gd.png" 
+{{< figure src="/img/neural_net_2/training_techniques_gd.webp" 
    alt="Gradient descent paths on a convex error surface" 
    caption="Figure 2 - Batch, mini-batch and SGD paths towards the minima" 
    align="center" >}}
@@ -71,14 +74,14 @@ We can see the difference in routes but they end up at least close to each other
 
 This next plot is the comparison between the error calculation and the number of steps. The purpose of this one is to emphasize the increase in steps and the decrease in mathematical complexity for each processing step. It's important to remember that computers are much more efficient at _simpler_ but parallel tasks than at intensive individual tasks, even more so if we consider the GPU (graphics processing unit). As already explained in the memory post, these units are perfect for these matrix calculations, and you can parallelize thousands of executions (important to say that execution here doesn't mean steps but smaller steps like weight updates or forward processing for example)
 
-{{< figure src="/img/neural_net_2/comparison_steps.png" 
+{{< figure src="/img/neural_net_2/comparison_steps.webp" 
    alt="Error against the number of steps for each training technique" 
    caption="Figure 3 - Error against the number of steps for each technique" 
    align="center" >}}
 
 But even memory parallelization hits a ceiling. I plotted the relation between the total processing time and the MSE reduction and it gets clear that the curve which reaches the MSE minimal line faster is the mini-batch one.
 
-{{< figure src="/img/neural_net_2/mini_batch_cumulative_wall_clock.png" 
+{{< figure src="/img/neural_net_2/mini_batch_cumulative_wall_clock.webp" 
    alt="Cumulative wall-clock time against MSE reduction" 
    caption="Figure 4 - Cumulative wall-clock time against MSE reduction" 
    align="center" >}}
@@ -93,7 +96,7 @@ The intuition for this one is more direct. If you want to evaluate something you
 
 That said, we want to find a way to train the model to recognize things from an image. To do that, Yann LeCun in 1989 published this solution [link](http://yann.lecun.com/exdb/publis/pdf/lecun-89e.pdf) which basically *IS* the CNN up until 2012 (the year AlexNet was released and things took another route and also exploded into other areas, but we are going to talk about that later). In the article they introduce their setup.
 
-{{< figure src="/img/neural_net_2/cnn_initial_structure.png" 
+{{< figure src="/img/neural_net_2/cnn_initial_structure.webp" 
    alt="LeCun's original CNN architecture" 
    caption="Figure 5 - LeCun's original CNN structure from the 1989 paper" 
    align="center" >}}
@@ -104,7 +107,7 @@ First things first, what is a convolution? It is a mathematical operation betwee
 
 If you have any curiosity about convolutions, want to dive deeper, or want more intuition about what it represents in reality, I recommend the [convolution video](https://www.youtube.com/watch?v=KuXjwB4LzSA) from 3Blue1Brown before the rest of this post.
 
-{{< figure src="/img/neural_net_2/convolution_3blue1brown.png" 
+{{< figure src="/img/neural_net_2/convolution_3blue1brown.webp" 
    alt="Convolution of a kernel over a Kirby image" 
    caption="Figure 6 - Convolution example from the 3Blue1Brown video" 
    align="center" >}}
@@ -115,7 +118,7 @@ You can imagine that the output image of Kirby represents some spectrum of the o
 
 But for now let's think about it in the same way as the perceptron, where you could manually set up some weights to distinguish a pattern that will output whether your needs are met or not. With that in mind, look at the image context. You could want to find one circle + one diagonal line and say it's a six, but it could be a rotated nine, or it could hallucinate some other number, or even mistakenly have more than one number in the same image. We want to find a reliable way to find patterns in the whole image without any position, horizontality or verticality restriction. 
 
-{{< figure src="/img/neural_net_2/kernel_comparison.png" 
+{{< figure src="/img/neural_net_2/kernel_comparison.webp" 
    alt="Comparison of different kernels applied to an image" 
    caption="Figure 7 - Comparison of different kernels applied to an image" 
    align="center" >}}
@@ -127,7 +130,7 @@ Diving deeper into technical details now, observe that applying the kernel to th
 >There are some types of pooling, but to explain a bit about them I got this example of Max (the max value between the 4 units in this case) and average, which would calculate the average of the neighbouring units. (The average one blurs the image, and since every neighbour gets the same weight it is a box/mean blur)
 
 <!-- Pooling example with stride 2 -->
-{{< figure src="/img/neural_net_2/pooling_stride_2.png" 
+{{< figure src="/img/neural_net_2/pooling_stride_2.webp" 
    alt="Max and average pooling with stride 2" 
    caption="Figure 8 - Max and average pooling with stride 2" 
    align="center" >}}
@@ -137,7 +140,7 @@ Then finally in the last layer they use a nonlinear function (remember that we n
 >In LeCun's work they used the value range for each unit as -1 to 1 considering grayscale, in other words a black to white gradient. Because of this, the marked range in the $tanh$ is like that. 
 
 <!-- Tanh function example -->
-{{< figure src="/img/neural_net_2/tanh_activation.png" 
+{{< figure src="/img/neural_net_2/tanh_activation.webp" 
    alt="Tanh activation function and its derivative" 
    caption="Figure 9 - Tanh activation function and its derivative" 
    align="center" >}}
@@ -152,7 +155,7 @@ We already talked about that in the last post, but if you look at the derivative
 
 In 1998, LeNet-5 was released as the new state of the art for convolutional neural networks. This one improved the accuracy in overall performance and had a more structured and engineered architecture. The training dataset was almost 10x larger, now with 60,000 training images, and they used bigger images as inputs. Let's review the changes.
 
-{{< figure src="/img/neural_net_2/lenet-5-architecture.png" 
+{{< figure src="/img/neural_net_2/lenet-5-architecture.webp" 
    alt="LeNet-5 architecture diagram" 
    caption="Figure 10 - LeNet-5 architecture" 
    align="center" >}}
@@ -210,7 +213,7 @@ The value is negative because we want to train the log to get smaller while the 
 - If $y_i$ (distance) is small, $e^{-y_i}$ is large.
 - If $y_i$ (distance) is large, $e^{-y_i}$ is close to zero.
 
-{{< figure src="/img/neural_net_2/euler_exponent_neg.png" 
+{{< figure src="/img/neural_net_2/euler_exponent_neg.webp" 
    alt="Plot of e to the negative y_i against the distance y_i" 
    caption="Figure 11 - e^{-y_i} decay as the distance y_i increases" 
    align="center" >}}
@@ -256,7 +259,7 @@ $$\sum_{k} \delta_{o_k} \cdot w_k$$
 
 And visually as:
 
-{{< figure src="/img/neural_net_2/cnn_weight_sharing_backprop.png" 
+{{< figure src="/img/neural_net_2/cnn_weight_sharing_backprop.webp" 
    alt="Diagram of the error propagating back through shared kernel weights to the previous layer" 
    caption="Figure 12 - Error propagation through shared weights to the layer before" 
    align="center" >}}
@@ -387,5 +390,5 @@ Also, many thanks to my friends that keep cheering for me in continuing this pro
 - Training at scale (Adam, AdamW, batch norm, LR schedules)
 - James briggs ref - https://www.youtube.com/watch?v=ZBfpkepdZlw
 -->
-<!-- ![Neural Networks](/img/neural_net/neural_networks.png) -->
+<!-- ![Neural Networks](/img/neural_net/neural_networks.webp) -->
 ____

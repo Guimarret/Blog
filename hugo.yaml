@@ -113,6 +113,9 @@ taxonomies:
 
 markup:
   goldmark:
+    parser:
+      attribute:
+        block: true # lets a `{.no-drawing}` line set a class on the block above it
     renderer:
       unsafe: true
     extensions:

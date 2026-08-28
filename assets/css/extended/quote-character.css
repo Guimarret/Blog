@@ -1,0 +1,60 @@
+/* Blockquotes in posts are the author speaking: a small character stands to the
+   left of the quote bar. */
+
+.post-content blockquote {
+    --quote-avatar-size: 58px;
+    --quote-avatar-gap: 22px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* never shorter than the character, otherwise it spills onto the next paragraph */
+    min-height: calc(var(--quote-avatar-size) * 313 / 260);
+    margin: 1.6rem 0 1.6rem calc(var(--quote-avatar-size) + var(--quote-avatar-gap));
+    padding-inline-start: 1rem;
+    border-inline-start: 0.3rem solid var(--content);
+}
+
+.post-content blockquote > :first-child {
+    margin-top: 0;
+}
+
+.post-content blockquote > :last-child {
+    margin-bottom: 0;
+}
+
+/* the character */
+.post-content blockquote::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    inset-inline-start: calc(-1 * (var(--quote-avatar-size) + var(--quote-avatar-gap)));
+    width: var(--quote-avatar-size);
+    height: calc(var(--quote-avatar-size) * 313 / 260);
+    transform: translateY(-50%);
+    background: url("/img/blog/me_draw.png") no-repeat center / contain;
+    pointer-events: none;
+}
+
+/* the drawing is dark line art, so give it a faint halo on the dark theme */
+[data-theme="dark"] .post-content blockquote::before {
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.55)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.25));
+}
+
+@media (max-width: 700px) {
+    .post-content blockquote {
+        --quote-avatar-size: 44px;
+        --quote-avatar-gap: 10px;
+    }
+}
+
+/* Opt out per quote: put `{.no-drawing}` on the line right after the `>` block.
+   The indentation is kept so a run of quotes stays aligned with the first one. */
+.post-content blockquote.no-drawing {
+    /* no character to clear, so the box can be as short as its text again */
+    min-height: 0;
+}
+
+.post-content blockquote.no-drawing::before {
+    content: none;
+}

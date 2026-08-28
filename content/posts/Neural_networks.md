@@ -17,7 +17,7 @@ I'm going to try to cover everything from zero to present. I am not sure if it w
 # Perceptron
 You can think of the perceptron as being the start of neural network applications. It was published in 1958 and explained how we could train artificial neurons to output desired data. The idea is pretty simple, it takes inputs of some type, and based on some parameters and thresholds, it outputs something with the desired behavior.
 
-{{< figure src="/img/neural_net/perceptron.png"
+{{< figure src="/img/neural_net/perceptron.webp"
    alt="Diagram of a perceptron: weighted inputs feeding into a summation and a threshold function"
    caption="Figure 1 — The perceptron"
    align="center" >}}
@@ -33,7 +33,7 @@ So in this case we have to change it little by little while testing to reach the
 It's kind of complicated to think about for the first time, but it makes sense. We don't care how the weights are set but only if the output is correct. So we have to provide a data source of example with the source of truth, like a datasheet with multiple lines, where each line will have 200 inputs and the desired result.
 Then create a function to change the weights individually based on the desired result so it becomes more likely to get the correct answer.
 
-{{< figure src="/img/neural_net/learning_rates_formula.png"
+{{< figure src="/img/neural_net/learning_rates_formula.webp"
    alt="Perceptron weight-update formula"
    caption="Figure 2 — Perceptron weight-update rule"
    align="center" >}}
@@ -99,7 +99,7 @@ This represents the line that best fits the points in the Cartesian plane. Also 
 
 At the end of the day, when considering multiple inputs, we are looking for the “minimum” total squared errors (which is summed across all data points). So to demonstrate a real situation with two inputs (it's not possible to visualize more dimensions, too, so we are going to show everything from now on considering only two inputs and generalize for more inputs):
 
-{{< figure src="/img/neural_net/error_surface_1.png" 
+{{< figure src="/img/neural_net/error_surface_1.webp" 
    alt="Convex error surface (bowl shape) over two weights" 
    caption="Figure 4 — Error surface (convex bowl)" 
    align="center" >}}
@@ -120,7 +120,7 @@ This algorithm is the union of the Loss function (MSE) with some tweaks to reach
 
 So, considering this plot:
 
-{{< figure src="/img/neural_net/gradient_desc.png" 
+{{< figure src="/img/neural_net/gradient_desc.webp" 
    alt="Non-convex error surface with multiple minima" 
    caption="Figure 5 — Non-convex error surface" 
    align="center" >}}
@@ -153,7 +153,7 @@ So the recap is we got the error function, applied a property called derivation 
 
 Reminder that the \(\eta \) is just the learning rate which we want. If it's too big it will start jumping around and if it's too small it will take too much time to reach the optimal goal, as we can see in the image:
 
-{{< figure src="/img/neural_net/learning_rate.png" 
+{{< figure src="/img/neural_net/learning_rate.webp" 
    alt="Effect of the learning rate: small steps converge slowly, large steps overshoot" 
    caption="Figure 6 — Learning rate" 
    align="center" >}}
@@ -171,7 +171,7 @@ First, why isn't a single perceptron enough? Because it can only split data with
 | 1 | 0 | 1 |
 | 1 | 1 | 0 |
 
-{{< figure src="/img/neural_net/xor_plot.png" 
+{{< figure src="/img/neural_net/xor_plot.webp" 
    alt="Two panels: on the left the four XOR points, where no single straight line separates the true points (one diagonal) from the false points (the other); on the right two lines combined isolate the true points, which is what a hidden layer does" 
    caption="Figure 7 - XOR isn't linearly separable, but combining two lines (a hidden layer) solves it" 
    align="center" >}}
@@ -183,7 +183,7 @@ This point is a milestone in training models, perceptrons, etc. There are two re
 So, let's dive into it. This image represents a multilayer perceptron, and as clearly represented, it has 3 parts: the input, hidden layers, and output.
 
 
-{{< figure src="/img/neural_net/multilayer_perceptron.png" id="fig8"
+{{< figure src="/img/neural_net/multilayer_perceptron.webp" id="fig8"
    alt="Multilayer perceptron: one simple hidden layer with linear and sigmoid functions" 
    caption="Figure 8 - Multilayer perceptron" 
    align="center" >}}
@@ -194,7 +194,7 @@ Not going to elaborate on the inputs and outputs because it's still the same. Th
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
 <summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click to see the plot comparison</summary>
-{{< figure src="/img/neural_net/linear_nonlinear_plot.png" alt="Linear and nonlinear plot" caption="Figure 9 - Linear and nonlinear plot" align="center" >}}
+{{< figure src="/img/neural_net/linear_nonlinear_plot.webp" alt="Linear and nonlinear plot" caption="Figure 9 - Linear and nonlinear plot" align="center" >}}
 </details>
 
 We already talked about that, but as Figure 8 shows, the _linear_ part represents the trainable pieces, which is the weight adjustment to the values that are being passed.
@@ -243,7 +243,7 @@ $$g(f(x)) = W x + B$$
 </details>
 
 
-{{< figure src="/img/neural_net/why_the_activation.png" 
+{{< figure src="/img/neural_net/why_the_activation.webp" 
    alt="Diagram showing why a nonlinear activation function is needed between linear layers" 
    caption="Figure 11 - Why the activation function is needed" 
    align="center" >}}
@@ -254,7 +254,7 @@ $$\sigma(x) = \frac{1}{1 + e^{-x}}$$
 
 This is the graph plot of this function:
 
-{{< figure src="/img/neural_net/sigma_plot.png" 
+{{< figure src="/img/neural_net/sigma_plot.webp" 
    alt="Plot of the sigmoid function squashing values between 0 and 1" 
    caption="Figure 12 - Sigmoid function plot" 
    align="center" >}}
@@ -265,7 +265,7 @@ For the sake of simplicity, I was keeping just the MSE, but right now we can hav
 
 >Recap: Derivatives point to the steepest ascent. The derivative of the sigmoid correction will only make a difference if the value is _existent_.
 
-{{< figure src="/img/neural_net/derivative_sigmoid.png" 
+{{< figure src="/img/neural_net/derivative_sigmoid.webp" 
    alt="Sigmoid and its derivative plotted side by side, the derivative peaking near zero and flattening at the tails" 
    caption="Figure 13 - Derivative of the sigmoid" 
    align="center" >}}
@@ -279,10 +279,12 @@ So the solution for binary classification is:
 This loss function, contrary to the MSE, performs well in binary classifications. 
 
 >Recap: the $\hat{Y}_i$ is the predicted value and the $Y_i$ is the true label/correct value from the training dataset.
+{.no-drawing}
 
 > We will always use the negative log because numbers will always range from 0 to 1, and this range always returns a negative log, but it's still super convenient for quantitative measurement in our case.
 
 >Math reminder $log(1) = 0$ and $log(0) = -\infty$
+{.no-drawing}
 
 $$ - (Y_i \cdot \log \hat{Y}_i + (1 - Y_i) \cdot \log(1 - \hat{Y}_i))$$
 
@@ -310,7 +312,7 @@ This table shows the relation of the sliced parts when put together:
 
 And the plot relation is this:
 
-{{< figure src="/img/neural_net/binary_cross_entropy_plot_agg.png" 
+{{< figure src="/img/neural_net/binary_cross_entropy_plot_agg.webp" 
    alt="Binary cross-entropy loss curves: the positive-class term, the negative-class term, and their aggregate plotted against the predicted value" 
    caption="Figure 14 - Cross entropy plot for positive, negative, and agg" 
    align="center" >}}
@@ -354,7 +356,7 @@ Now for the actual training, we already know how to apply the gradient descent u
 
 Let's start visualizing a multilayer example (one neuron per layer):
 
-{{< figure src="/img/neural_net/multineuron.png" 
+{{< figure src="/img/neural_net/multineuron.webp" 
    alt="Multilayer network with one neuron per layer: input, two hidden layers with activations, and output, with 3 weights and biases feeding the z and activation functions below" 
    caption="Figure 15 - Multilayer (one neuron per layer) visualization" 
    align="center" >}}
@@ -378,10 +380,12 @@ $$x \to z^{(L-2)} \to a^{(L-2)} \to z^{(L-1)} \to a^{(L-1)} \to z^{(L)} \to a^{(
 And this is the feedforward where the values pass once and then proceed to training based on error.
 
 >Now we start to cook the backpropagation idea, think that we want to make the system more optimized aka change the weights to increase the accuracy, push the output towards our goals and how do we do that? Apply derivatives to find the steepest ascent for each layer. I'm gonna use as example the MSE as error function to simplify the steps (the binary cross entropy adds a bit too much visual noise).
+{.no-drawing}
 
 >Recap: everything we're about to do is just the _chain rule_ from calculus. When a value passes through a stack of functions, the derivative of the whole thing is the product of the derivative of each step. Backpropagation is literally that rule applied layer by layer, walking from the output back to the input.
 
 > We are not gonna use an activation function so I'm obfuscating the $a$ for the $z$ directly, so consider the $z^{(L)} = w^{(L)} z^{(L-1)} + b^{(L)}$
+{.no-drawing}
 
 <details style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
 <summary style="cursor: pointer; font-weight: 500; color: #000000;"> Click if you want to see the math without hiding the $a$</summary>
@@ -495,14 +499,14 @@ It doesn't change much from the multilayer with one neuron in each layer as we a
 
 A simple representation of how the activation and the weight lines will be noted:
 
-{{< figure src="/img/neural_net/index_update.png" 
+{{< figure src="/img/neural_net/index_update.webp" 
    alt="Two neurons connected by a weight, showing the index notation: activation a_k from layer L-1 feeding neuron a_j in layer L through weight W_jk" 
    caption="Figure 16 - Weight index notation between two neurons" 
    align="center" >}}
 
 Yes, the weight looks weird, like inverted, but that's how it is. We can read as the activation from the last layer $L-1$ and position $k$ (here position is like horizontally, we can have multiple floors of neurons pointing to the layer from $L$ for example), and the $j$ from the neuron in $L$ is the same as $k$ with a different notation. 
 
-{{< figure src="/img/neural_net/multilayer_multiunit.png" 
+{{< figure src="/img/neural_net/multilayer_multiunit.webp" 
    alt="Multineuron multiunit" 
    caption="Figure 17 - Multi-unit Multineuron visualization" 
    align="center" >}}

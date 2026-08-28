@@ -47,7 +47,7 @@ With that, we remove the problem of an inconsistent state where both are off or 
 
 ## Flip-Flop 
 
-{{< figure src="/img/memory/sr-flip-flop-logic-circuit.jpg"
+{{< figure src="/img/memory/sr-flip-flop-logic-circuit.webp"
    alt="Clocked SR flip-flop: SR inputs ANDed with a clock line so updates only happen on the clock"
    caption="Figure 3 - Clocked SR flip-flop"
    align="center" >}}
@@ -106,7 +106,7 @@ From the architectural registers, there are the General-purpose registers (GPRs)
 
 These registers, except for some GPRs, the FPRs, and the Vector/SIMD registers, are all D flip-flop type (for reference, the D flip-flop is two D latches chained in a master-slave setup so it captures the value on the clock _edge_ instead of staying transparent the whole time the enable is high), and this is mostly because of the reliability. The SR latch has an inconsistent state at S=R=1, and the JK has undefined behavior when changing the value while the clock is active. The D doesn't have any of these problems because the only possible output is 0 or 1 regardless of the situation, as we can see in the truth table:
 
-{{< figure src="/img/memory/d_type_flip-flop.png"
+{{< figure src="/img/memory/d_type_flip-flop.webp"
    alt="D flip-flop truth table: the output Q simply follows the D input on each clock edge"
    caption="Figure 7 - D flip-flop truth table"
    attr="Source: GeeksforGeeks"
@@ -136,7 +136,7 @@ Here is one example of a multi-core architecture with the L1, L2, L3 labeled in 
 
 > If you are interested I recommend this [thread](https://superuser.com/questions/196143/where-exactly-l1-l2-and-l3-caches-located-in-computer) and the [blog post](https://pikuma.com/blog/understanding-computer-cache) from pikuma (source of the image below)
 
-{{< figure src="/img/memory/i5_first_gen_processor_l1_l2_l3.png"
+{{< figure src="/img/memory/i5_first_gen_processor_l1_l2_l3.webp"
    alt="Multi-core CPU layout with the L1, L2 and L3 cache levels labeled"
    caption="Figure 9 - L1/L2/L3 cache in a multi-core CPU"
    attr="Source: Pikuma (understanding computer cache)"
@@ -153,7 +153,7 @@ Standing for static random-access memory (SRAM), this memory's main purpose is t
 
 Here is the simplified diagram of the 6T SRAM (6 transistors Static Random Access Memory):
 
-{{< figure src="/img/memory/SRAM_Cell_Inverter_Loop_simplied.png"
+{{< figure src="/img/memory/SRAM_Cell_Inverter_Loop_simplied.webp"
    alt="Simplified 6T SRAM cell: two cross-coupled inverters forming the storage loop, drawn at a high level without the individual transistors"
    caption="Figure 10 - Simplified 6T SRAM cell (inverter loop)"
    attr="Source: Wikimedia Commons"
@@ -166,7 +166,7 @@ Here is the simplified diagram of the 6T SRAM (6 transistors Static Random Acces
 
 They are the same, but this one shows all the transistors instead of the high level view:
 
-{{< figure src="/img/memory/Standard-6T-SRAM-Cell.png"
+{{< figure src="/img/memory/Standard-6T-SRAM-Cell.webp"
    alt="Standard 6T SRAM cell: two cross-coupled inverters back to back, with two access pass transistors gated by the word line (WL) connecting the cell to the bit lines (BL and BLB)."
    caption="Figure 11 - Standard 6T SRAM cell"
    attr="Source: ResearchGate (Standard 6T SRAM cell)"
@@ -176,7 +176,7 @@ They are the same, but this one shows all the transistors instead of the high le
 
 Starting with these dual NOT logic gates, this gate changes the input so that if 1 is entered, the other side will be 0:
 
-{{< figure src="/img/memory/dual_not_logic_gate.png"
+{{< figure src="/img/memory/dual_not_logic_gate.webp"
    alt="Two NOT gates back to back: a 1 entering one side forces a 0 on the other"
    caption="Figure 12 - Cross-coupled NOT gates (the storage loop)"
    align="center" >}}
@@ -185,7 +185,7 @@ Starting with these dual NOT logic gates, this gate changes the input so that if
 
 Here there are two transistors that just link the output of the dual gate inside to the outside. So, if the wordline is one, this gate will be open, otherwise it won't. (The transistor can be used as a gate and as an amplifier. In this case it's used as the gate connection, and the gate controller is this wordline).
 
-{{< figure src="/img/memory/connector_transistor.png"
+{{< figure src="/img/memory/connector_transistor.webp"
    alt="Two access transistors linking the cell's internal nodes to the outside bit lines, opened or closed by the wordline"
    caption="Figure 13 - Access transistors gated by the wordline"
    align="center" >}}
@@ -211,7 +211,7 @@ This comparison is done using a differential sense amplifier, and the general id
 
 The sense amplifier's goal is to amplify, of course, but why? Because there is noise in the signal, and when we talk about extremely small transistors, the capacity to ground the voltage or increase it is smaller than in denser transistors. So we do the trick of amplifying the signal and comparing afterward. This way we get a better output, not perfect, but it doesn't matter. Comparing 0.99 to 0.5 is much better than comparing 0.8 to 0.64, for example, because when the difference is minimal, the chance of missing because of noise is big. Fixing the difference problem, we can get a clean digital output with minimal trickery afterward and actually use the data from the bits. In the image below, we can see the moment things happen:
 
-{{< figure src="/img/memory/sense_amplier_video_electron_tube_take.png"
+{{< figure src="/img/memory/sense_amplier_video_electron_tube_take.webp"
    alt="Differential sense amplifier in action: the small voltage gap between BL and BL-bar being driven apart into a clean digital level"
    caption="Figure 14 - Differential sense amplifier amplifying the bitline difference"
    attr="Source: YouTube (sense amplifier explanation)"
@@ -233,7 +233,7 @@ After the bitlines pass the inverted voltage and the wordline disconnects, we ge
 
 This is a schema of a 48-bit SRAM group (the least ugly and most visually friendly architecture I could find, tbh). I will not explain the drivers, decoders, and go deeper on sense amplifiers today, but it's good to know these things exist as a whole.
 
-{{< figure src="/img/memory/static_ram_group.png"
+{{< figure src="/img/memory/static_ram_group.webp"
    alt="Schematic of a 48-bit SRAM array with its address decoder, drivers, and sense amplifiers around the cell grid"
    caption="Figure 15 - 48-bit SRAM array (decoder, drivers, sense amplifiers)"
    attr="Source: aeapr.com.br"
@@ -242,7 +242,7 @@ This is a schema of a 48-bit SRAM group (the least ugly and most visually friend
 
 A more realistic and complete drawing would be this one, but with 32-bit 6x4:
 
-{{< figure src="/img/memory/32_bit_sram.png"
+{{< figure src="/img/memory/32_bit_sram.webp"
    alt="More detailed 32-bit SRAM array arranged as a 6x4 grid of cells with its surrounding logic"
    caption="Figure 16 - 32-bit SRAM array (6x4)"
    attr="Source: The Fragmentation Paradox (SRAM memories)"
@@ -257,7 +257,7 @@ For the DRAM, let's remember what it stands for: Dynamic Random Access Memory. T
 
 So, for a start, let's see what a capacitor is while looking at this representation:
 
-{{< figure src="/img/memory/schematic_diagram_capacitor.png"
+{{< figure src="/img/memory/schematic_diagram_capacitor.webp"
    alt="Schematic diagram of a parallel-plate capacitor: two conductive plates separated by a dielectric, storing charge across the gap"
    caption="Figure 17 - Parallel-plate capacitor"
    attr="Source: ResearchGate (parallel-plate capacitor schematic)"
@@ -289,28 +289,28 @@ Important to say that the write operation will only happen at row level, so the 
 
 The first state is the dram cell charge degradation in row 3, which was originally 1V, 0V and 1V respectively:
 
-{{< figure src="/img/memory/dram_1.png"
+{{< figure src="/img/memory/dram_1.webp"
    alt="DRAM refresh step 1: the charges stored in row 3 (originally 1V, 0V, 1V) have leaked and drifted away from their original levels"
    caption="Figure 19 - Refresh step 1: charge degradation"
    align="center" >}}
 
 The second state is the Bitline charging to Vdd/2 or 0.5V in the example:
 
-{{< figure src="/img/memory/dram_2.png"
+{{< figure src="/img/memory/dram_2.webp"
    alt="DRAM refresh step 2: the bitline is precharged to Vdd/2 (0.5V) before the cell is connected"
    caption="Figure 20 - Refresh step 2: bitline precharged to Vdd/2"
    align="center" >}}
 
 In the third state the wordline is activated and the bitline starts to equalize the current towards the charge inside the DRAM cell.
 
-{{< figure src="/img/memory/dram_3.png"
+{{< figure src="/img/memory/dram_3.webp"
    alt="DRAM refresh step 3: the wordline is activated and the bitline starts to equalize toward the charge stored in the cell"
    caption="Figure 21 - Refresh step 3: charge sharing"
    align="center" >}}
 
 Technically the previous state would be the last one because the Sense Amplifier is connected directly to the bitline, but for simplification reasons here is the final one. The sense amplifier will identify the change in the bitline and amplify the current towards the identified charge. It works similarly to the SRAM, but now we have only one line.
 
-{{< figure src="/img/memory/dram_4.png"
+{{< figure src="/img/memory/dram_4.webp"
    alt="DRAM refresh step 4: the sense amplifier detects the small shift on the bitline and drives it to the full level, restoring the cell's original value"
    caption="Figure 22 - Refresh step 4: sense amplifier restores the value"
    align="center" >}}
@@ -330,7 +330,7 @@ The architecture of the DRAM blocks of memory is divided into _Channel > DIMM > 
 - Column: Within an open row, picks which bits to actually read or write.
 - Cell: One transistor plus one capacitor. Stores a single bit.
 
-{{< figure src="/img/memory/chip_bank_hierarchy.png"
+{{< figure src="/img/memory/chip_bank_hierarchy.webp"
    alt="DRAM organization hierarchy: a chip divided into independent banks, each bank a grid of rows and columns of cells"
    caption="Figure 23 - DRAM chip and bank hierarchy"
    attr="Source: mean9park (DRAM Operation)"
