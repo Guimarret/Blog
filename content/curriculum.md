@@ -13,6 +13,9 @@ Results-driven Data Engineer with extensive experience in cloud technologies, in
 
 ### Work Experience:
 
+- Data Engineer, XPinc - (October 2026 - now)
+  Solve problems in financial markets
+
 - Data Engineer, Globo - (June 2024 - Now)
   Design and implement data solutions primarily using Google Cloud Platform (GCP), focusing on Dataform for data transformation.
   Develop and maintain cloud functions for various automation tasks, utilizing Python for backend processes.
