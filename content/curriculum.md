@@ -13,7 +13,7 @@ Results-driven Data Engineer with extensive experience in cloud technologies, in
 
 ### Work Experience:
 
-- Data Engineer, XPinc - (October 2026 - now)
+- Data Engineer, XPinc - (October 2026 - Now)
   Solve problems in financial markets
 
 - Data Engineer, Globo - (June 2024 - Now)
